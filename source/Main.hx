@@ -25,6 +25,6 @@ class Main extends Sprite
 			AxolAPI.sendEvent("GameExited");
 		});
 
-		addChild(new FlxGame(320, 240, SplashState, 6, 60, 60, true));
+		addChild(new FlxGame(426, 240, SplashState, 6, 60, 60, true));
 	}
 }

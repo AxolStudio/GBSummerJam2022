@@ -30,6 +30,8 @@ class Globals
 
 		FlxG.autoPause = false;
 
+		Actions.init();
+
 		gameInitialized = true;
 	}
 
