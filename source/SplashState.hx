@@ -43,10 +43,10 @@ class SplashState extends FlxState
 
 		super.create();
 
-		#if debug
-		exitState();
-		return;
-		#end
+		// #if debug
+		// exitState();
+		// return;
+		// #end
 
 		add(new FlxSequencer((s) ->
 		{

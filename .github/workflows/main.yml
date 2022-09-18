@@ -14,13 +14,18 @@ jobs:
       - uses: krdlab/setup-haxe@v1
       - uses: actions/checkout@v2
         with:
+          repository: axolstudio/flixel-addons
+          path: flixel-addons
+          token: ${{secrets.PAT}}
+      - uses: actions/checkout@v2
+        with:
           repository: axolstudio/axollib
           path: axollib
           token: ${{secrets.PAT}}
       - run: haxelib install lime 8.0.0 --quiet
       - run: haxelib install openfl 9.2.0 --quiet
       - run: haxelib install flixel --quiet
-      - run: haxelib install flixel-addons --quiet
+      - run: haxelib dev flixel-addons flixel-addons --quiet
       - run: haxelib dev axollib axollib --quiet
       - run: haxelib git djFlixel https://github.com/john32b/djFlixel
       - name: Build

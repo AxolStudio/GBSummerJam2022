@@ -16,6 +16,8 @@ class Player extends FlxSprite
 	public static var TRANS_COOLDOWN_TIME:Float = .5;
 	public static var LASER_COOLDOWN_TIME:Float = .5;
 
+	public static var MAX_HEALTH:Float = 100;
+
 	public var thrustMax:Float = .5;
 
 	public var thrust:Float = 0;
@@ -25,9 +27,14 @@ class Player extends FlxSprite
 	public var transCooldown:Float = -1;
 	public var laserCooldown:Float = -1;
 
+	public var shipHealth:Float;
+	public var mechHealth:Float;
+
 	public function new():Void
 	{
 		super();
+
+		mechHealth = shipHealth = MAX_HEALTH;
 
 		makeGraphic(12, 6, FlxColor.WHITE);
 
@@ -36,6 +43,27 @@ class Player extends FlxSprite
 		drag.set(SHIP_DRAG, SHIP_DRAG);
 
 		facing = FlxObject.RIGHT;
+	}
+
+	override function hurt(Damage:Float)
+	{
+		if (mode == SHIP)
+		{
+			shipHealth -= Damage;
+			if (shipHealth <= 0)
+			{
+				shipHealth = 0;
+				switchMode();
+			}
+		}
+		else
+		{
+			mechHealth -= Damage;
+			if (mechHealth <= 0)
+			{
+				kill();
+			}
+		}
 	}
 
 	override function update(elapsed:Float)
@@ -47,6 +75,16 @@ class Player extends FlxSprite
 
 		if (laserCooldown > 0)
 			laserCooldown -= elapsed;
+
+		if (mode == MECH)
+		{
+			if (shipHealth < MAX_HEALTH)
+			{
+				shipHealth += elapsed;
+				if (shipHealth > MAX_HEALTH)
+					shipHealth = MAX_HEALTH;
+			}
+		}
 
 		if (velocity.x < 0)
 			facing = FlxObject.LEFT;

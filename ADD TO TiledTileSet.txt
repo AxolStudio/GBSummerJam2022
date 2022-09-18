@@ -1,5 +1,0 @@
-if (node.x.exists("class"))
-{
-    var c:String = node.x.get("class").toString();
-    tileClasses[id] = c;
-}

@@ -4,16 +4,12 @@ import flixel.addons.editors.tiled.TiledMap;
 import flixel.addons.editors.tiled.TiledObjectLayer;
 import flixel.addons.editors.tiled.TiledTileLayer;
 import flixel.addons.editors.tiled.TiledTileSet;
-import flixel.addons.tile.FlxTilemapExt;
-import flixel.group.FlxGroup;
 import flixel.tile.FlxTilemap;
 import haxe.io.Path;
 
 class TiledLevel extends TiledMap
 {
 	inline static var c_PATH_LEVEL_TILESHEETS = "assets/images/";
-
-	var collidableTileLayers:Array<FlxTilemap>;
 
 	public function new(Level:FlxTiledMapAsset, State:PlayState):Void
 	{
@@ -49,14 +45,10 @@ class TiledLevel extends TiledMap
 			var imagePath = new Path(tileSet.imageSource);
 			var processedPath = c_PATH_LEVEL_TILESHEETS + imagePath.file + "." + imagePath.ext;
 
-			var tilemap = new FlxTilemapExt();
+			var tilemap = new FlxTilemap();
 			tilemap.loadMapFromArray(tileLayer.tileArray, width, height, processedPath, tileSet.tileWidth, tileSet.tileHeight, OFF, tileSet.firstGID, 1, 1);
 
-			if (collidableTileLayers == null)
-				collidableTileLayers = new Array<FlxTilemap>();
-
 			State.mapLayer.add(tilemap);
-			collidableTileLayers.push(tilemap);
 		}
 	}
 
