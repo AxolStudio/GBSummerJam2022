@@ -42,6 +42,12 @@ class SplashState extends FlxState
 		AxolAPI.sendEvent("GameStart");
 
 		super.create();
+
+		#if debug
+		exitState();
+		return;
+		#end
+
 		add(new FlxSequencer((s) ->
 		{
 			switch (s.step)
@@ -158,12 +164,17 @@ class SplashState extends FlxState
 					});
 
 				case 10:
-					Stripes.CREATE(() -> Globals.gotoState(AxolAPI.firstState), {
-						mode: "on,right",
-						color: Globals.COLORS[0],
-						snd: "hihat"
-					});
+					exitState();
 			}
 		}, 0));
+	}
+
+	public function exitState():Void
+	{
+		Stripes.CREATE(() -> Globals.gotoState(AxolAPI.firstState), {
+			mode: "on,right",
+			color: Globals.COLORS[0],
+			snd: "hihat"
+		});
 	}
 }

@@ -8,6 +8,8 @@ import openfl.utils.ByteArray;
 
 class Globals
 {
+	public static var gameTimer:Float = 0;
+
 	static private var axolBytes = new AxolKey();
 
 	static private var AXOL_KEY:String = StringTools.replace(axolBytes.readUTFBytes(axolBytes.length), "\n", "");

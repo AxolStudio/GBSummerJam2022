@@ -18,6 +18,7 @@ class Actions
 	public static var right:FlxActionDigital;
 	public static var transform:FlxActionDigital;
 	public static var thrust:FlxActionDigital;
+	public static var attack:FlxActionDigital;
 	public static var pause:FlxActionDigital;
 
 	public static var leftStick:FlxActionAnalog;
@@ -39,6 +40,7 @@ class Actions
 		Actions.transform = new FlxActionDigital();
 		Actions.thrust = new FlxActionDigital();
 		Actions.pause = new FlxActionDigital();
+		Actions.attack = new FlxActionDigital();
 
 		Actions.leftStick = new FlxActionAnalog();
 
@@ -49,7 +51,8 @@ class Actions
 			Actions.right,
 			Actions.pause,
 			Actions.transform,
-			Actions.thrust
+			Actions.thrust,
+			Actions.attack
 		], [Actions.leftStick]);
 
 		gameplayIndex = Actions.actions.addSet(gameplaySet);
@@ -68,6 +71,7 @@ class Actions
 
 		Actions.thrust.addKey(X, PRESSED);
 		Actions.transform.addKey(Z, PRESSED);
+		Actions.attack.addKey(C, PRESSED);
 
 		Actions.up.addGamepad(DPAD_UP, PRESSED);
 		Actions.down.addGamepad(DPAD_DOWN, PRESSED);
@@ -78,6 +82,7 @@ class Actions
 
 		Actions.thrust.addGamepad(A, PRESSED);
 		Actions.transform.addGamepad(B, PRESSED);
+		Actions.attack.addGamepad(X, PRESSED);
 
 		Actions.actions.activateSet(Actions.gameplayIndex, FlxInputDevice.ALL, FlxInputDeviceID.ALL);
 	}

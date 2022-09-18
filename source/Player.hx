@@ -10,11 +10,20 @@ class Player extends FlxSprite
 
 	public static var MAX_MECH_SPEED:Float = 160;
 	public static var MECH_ACC:Float = 3200;
-	public static var MECH_DRAG:Float = 1000;
+	public static var MECH_DRAG:Float = 2000;
+	public static var MECH_THRUST:Float = 60;
+
+	public static var TRANS_COOLDOWN_TIME:Float = .5;
+	public static var LASER_COOLDOWN_TIME:Float = .5;
+
+	public var thrustMax:Float = .5;
+
+	public var thrust:Float = 0;
 
 	public var mode(default, null):PlayerMode = SHIP;
 
 	public var transCooldown:Float = -1;
+	public var laserCooldown:Float = -1;
 
 	public function new():Void
 	{
@@ -36,6 +45,9 @@ class Player extends FlxSprite
 		if (transCooldown > 0)
 			transCooldown -= elapsed;
 
+		if (laserCooldown > 0)
+			laserCooldown -= elapsed;
+
 		if (velocity.x < 0)
 			facing = FlxObject.LEFT;
 		else if (velocity.x > 0)
@@ -47,11 +59,12 @@ class Player extends FlxSprite
 		if (transCooldown > 0)
 			return;
 
-		transCooldown = .5;
+		transCooldown = TRANS_COOLDOWN_TIME;
 
 		if (mode == SHIP)
 		{
 			mode = MECH;
+			y -= 6;
 			makeGraphic(6, 12, FlxColor.WHITE);
 			width = 6;
 			height = 12;
@@ -59,10 +72,12 @@ class Player extends FlxSprite
 			drag.set(MECH_DRAG, MECH_DRAG);
 			acceleration.set();
 			velocity.set();
+			acceleration.y = PlayState.GRAVITY;
 		}
 		else if (mode == MECH)
 		{
 			mode = SHIP;
+			x -= 6;
 			makeGraphic(12, 6, FlxColor.WHITE);
 			width = 12;
 			height = 6;
