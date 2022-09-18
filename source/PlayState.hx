@@ -1,5 +1,6 @@
 package;
 
+import Enemy.EnemyType;
 import flixel.FlxCamera.FlxCameraFollowStyle;
 import flixel.FlxG;
 import flixel.FlxSprite;
@@ -17,27 +18,31 @@ class PlayState extends FlxState
 
 	public var player:Player;
 	public var bg:FlxSprite;
-	public var map:FlxTilemap;
+	public var level:TiledLevel;
 
 	public var playerAttacks:FlxTypedGroup<PlayerLaser>;
+	public var enemies:FlxTypedGroup<Enemy>;
+	public var mapLayer:FlxTypedGroup<FlxTilemap>;
 
 	override public function create()
 	{
 		add(bg = FlxGridOverlay.create(16, 16, FlxG.width * 5, -1, true, Globals.COLORS[0], Globals.COLORS[1]));
 
-		map = new FlxTilemap();
-		map.loadMapFromCSV('assets/data/world_01.csv', 'assets/images/tiles.png', 8, 8, FlxTilemapAutoTiling.OFF, 0, 1, 1);
-		add(map);
-
+		// map = new FlxTilemap();
+		// map.loadMapFromCSV('assets/data/world_01.csv', 'assets/images/tiles.png', 8, 8, FlxTilemapAutoTiling.OFF, 0, 1, 1);
+		// add(map);
+		add(mapLayer = new FlxTypedGroup<FlxTilemap>());
 		add(playerAttacks = new FlxTypedGroup<PlayerLaser>());
+		add(enemies = new FlxTypedGroup<Enemy>());
+
+		level = new TiledLevel("assets/data/world_01.tmx", this);
 
 		add(player = new Player());
 
 		player.x = 40;
 		player.y = (FlxG.height / 2) - (player.height / 2);
 
-		camera.setScrollBoundsRect(0, 0, map.width, FlxG.height, true);
-		camera.follow(player, FlxCameraFollowStyle.LOCKON);
+		FlxG.camera.follow(player, FlxCameraFollowStyle.LOCKON);
 
 		super.create();
 
@@ -62,16 +67,28 @@ class PlayState extends FlxState
 		laser.fire(player.x + (player.facing == FlxDirectionFlags.RIGHT ? player.width + 1 : -1), Std.int(player.y + (player.height / 2)) - 1, player.facing);
 	}
 
+	public function addEnemy(X:Float, Y:Float, EnemyType:EnemyType):Void
+	{
+		var enemy:Enemy = enemies.getFirstAvailable(Enemy);
+		if (enemy == null)
+		{
+			enemy = new Enemy();
+			enemies.add(enemy);
+		}
+
+		enemy.spawn(X, Y, EnemyType);
+	}
+
 	override public function update(elapsed:Float)
 	{
 		super.update(elapsed);
 
 		Globals.gameTimer += elapsed;
 
-		FlxG.collide(player, map);
+		// FlxG.collide(player, map);
 
 		updateMovement(elapsed);
-		
+
 		checkBounds();
 	}
 
@@ -116,12 +133,12 @@ class PlayState extends FlxState
 		if (player.mode == SHIP)
 		{
 			if (up && !down)
-				player.acceleration.y = -Player.SHIP_ACC / 2;
+				player.acceleration.y = -Player.SHIP_ACC / 5;
 			else if (down && !up)
-				player.acceleration.y = Player.SHIP_ACC / 2;
+				player.acceleration.y = Player.SHIP_ACC / 5;
 			else if (!up && !down)
 			{
-				player.acceleration.y /= 20;
+				player.acceleration.y /= 50;
 				if (Math.abs(player.acceleration.y) < 1)
 					player.acceleration.y = 0;
 			}
