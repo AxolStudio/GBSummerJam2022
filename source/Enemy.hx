@@ -22,6 +22,23 @@ class Enemy extends FlxSprite
 			case SHOOTER: 0xffdf7126;
 		}, false, enemyType);
 	}
+
+	override function update(elapsed:Float)
+	{
+		super.update(elapsed);
+
+		switch (enemyType)
+		{
+			case FLYER:
+				velocity.x = -100;
+				velocity.y = Math.cos(x * .05) * 100;
+				trace(velocity.y);
+
+			case WALKER:
+
+			case SHOOTER:
+		}
+	}
 }
 
 @:enum abstract EnemyType(String) from String to String
