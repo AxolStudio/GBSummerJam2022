@@ -1,3 +1,5 @@
+package;
+
 import flixel.FlxObject;
 import flixel.FlxSprite;
 import flixel.util.FlxColor;
@@ -11,7 +13,7 @@ class Player extends FlxSprite
 	public static var MAX_MECH_SPEED:Float = 160;
 	public static var MECH_ACC:Float = 3200;
 	public static var MECH_DRAG:Float = 2000;
-	public static var MECH_THRUST:Float = 60;
+	public static var MECH_THRUST:Float = 80;
 
 	public static var TRANS_COOLDOWN_TIME:Float = .5;
 	public static var LASER_COOLDOWN_TIME:Float = .5;

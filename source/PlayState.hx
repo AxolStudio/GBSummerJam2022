@@ -28,6 +28,8 @@ class PlayState extends FlxState
 
 	public static var GRAVITY:Float = 2200;
 
+	public var isUnderground:Bool = false;
+
 	public var player:Player;
 
 	public var bg:FlxSprite;
@@ -39,6 +41,7 @@ class PlayState extends FlxState
 	public var playerAttacks:FlxTypedGroup<PlayerLaser>;
 	public var enemies:FlxTypedGroup<Enemy>;
 	public var mapLayer:FlxTypedGroup<FlxTilemap>;
+	public var enemyAttacks:FlxTypedGroup<EnemyBullet>;
 
 	public var ui:FlxGroup;
 
@@ -55,8 +58,15 @@ class PlayState extends FlxState
 
 	override public function create()
 	{
+		Globals.State = this;
+
 		add(stars = new StarfieldSimple(SCREEN_WIDTH, SCREEN_HEIGHT, [0xff222034, 0xff5fcde4, 0xffffffff, 0xfffbf236]));
-		stars.scrollFactor.set();
+		stars.scrollFactor.x = 0;
+
+		add(bg = new FlxSprite());
+		bg.makeGraphic(SCREEN_WIDTH, WORLD_HEIGHT - SCREEN_HEIGHT, 0xff663931);
+		bg.scrollFactor.x = 0;
+		bg.y = SCREEN_HEIGHT;
 
 		add(mapLayer = new FlxTypedGroup<FlxTilemap>());
 		add(playerAttacks = new FlxTypedGroup<PlayerLaser>());
@@ -73,8 +83,11 @@ class PlayState extends FlxState
 		player.x = 40;
 		player.y = (FlxG.height / 2) - (player.height / 2);
 
+		FlxG.camera.focusOn(player.getMidpoint());
 		FlxG.camera.follow(player, FlxCameraFollowStyle.LOCKON);
 		FlxG.camera.setScrollBoundsRect(-WORLD_WIDTH, 0, WORLD_WIDTH * 3, SCREEN_HEIGHT, true);
+
+		add(enemyAttacks = new FlxTypedGroup<EnemyBullet>());
 
 		add(ui = new FlxGroup());
 		buildUI();
@@ -130,6 +143,17 @@ class PlayState extends FlxState
 		thrustBar.origin.x = 0;
 	}
 
+	public function fireEnemyBullet(X:Float, Y:Float, Angle:Float):Void
+	{
+		var bullet:EnemyBullet = enemyAttacks.getFirstAvailable(EnemyBullet);
+		if (bullet == null)
+		{
+			bullet = new EnemyBullet();
+			enemyAttacks.add(bullet);
+		}
+		bullet.fire(X, Y, Angle);
+	}
+
 	public function fireLaser()
 	{
 		if (player.laserCooldown > 0)
@@ -164,11 +188,13 @@ class PlayState extends FlxState
 
 		Globals.gameTimer += elapsed;
 
+		FlxG.collide(mapLayer, enemyAttacks, onEnemyAttackHitWall);
 		FlxG.collide(mapLayer, player, onPlayerHitWall);
 		FlxG.collide(mapLayer, playerAttacks, onPlayerAttackHitMap);
 
 		FlxG.overlap(enemies, player, enemyHitPlayer, didEnemyHitPlayer);
 		FlxG.overlap(playerAttacks, enemies, playerAttackHitEnemy, didPlayerAttackHitEnemy);
+		FlxG.overlap(enemyAttacks, player, enemyAttackHitPlayer, didEnemyAttackHitPlayer);
 
 		updateMovement(elapsed);
 
@@ -249,6 +275,11 @@ class PlayState extends FlxState
 			P.hurt(100);
 	}
 
+	private function onEnemyAttackHitWall(Map:FlxTilemap, Attack:EnemyBullet):Void
+	{
+		Attack.kill();
+	}
+
 	private function onPlayerAttackHitMap(Map:FlxTilemap, Attack:PlayerLaser):Void
 	{
 		Attack.kill();
@@ -276,6 +307,17 @@ class PlayState extends FlxState
 		return L.alive && E.alive;
 	}
 
+	private function enemyAttackHitPlayer(B:EnemyBullet, P:Player):Void
+	{
+		P.hurt(10);
+		B.kill();
+	}
+
+	private function didEnemyAttackHitPlayer(B:EnemyBullet, P:Player):Bool
+	{
+		return B.alive && P.alive;
+	}
+
 	public function checkBounds():Void
 	{
 		// if (player.x < 2)
@@ -287,13 +329,21 @@ class PlayState extends FlxState
 		// 	player.x = FlxG.worldBounds.width - player.width - 2;
 		// }
 
-		if (player.y < 2)
+		if (player.y < 8)
 		{
-			player.y = 2;
+			player.y = 8;
 		}
-		else if (player.y > FlxG.worldBounds.height - player.height - 2)
+		else if (!isUnderground && player.y > SCREEN_HEIGHT - player.height - 2)
 		{
-			player.y = FlxG.worldBounds.height - player.height - 2;
+			FlxG.camera.setScrollBoundsRect(-WORLD_WIDTH, 0, WORLD_WIDTH * 3, WORLD_HEIGHT, true);
+			isUnderground = true;
+			FlxG.camera.followLerp = 0.2;
+		}
+		else if (isUnderground && player.y < SCREEN_HEIGHT - player.height - 2)
+		{
+			FlxG.camera.setScrollBoundsRect(-WORLD_WIDTH, 0, WORLD_WIDTH * 3, SCREEN_HEIGHT, true);
+			isUnderground = false;
+			FlxG.camera.followLerp = 0;
 		}
 	}
 

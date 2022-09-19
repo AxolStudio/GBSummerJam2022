@@ -1,3 +1,5 @@
+package;
+
 import axollib.AxolAPI;
 import djFlixel.D;
 import djFlixel.gfx.RainbowStripes;
@@ -6,11 +8,9 @@ import djFlixel.gfx.Stripes;
 import djFlixel.gfx.TextBouncer;
 import djFlixel.other.DelayCall;
 import djFlixel.other.FlxSequencer;
-import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.FlxState;
 import flixel.system.FlxSound;
-import flixel.util.FlxColor;
 
 class SplashState extends FlxState
 {

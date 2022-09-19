@@ -1,3 +1,5 @@
+package;
+
 import flixel.FlxG;
 import flixel.input.actions.FlxAction.FlxActionAnalog;
 import flixel.input.actions.FlxAction.FlxActionDigital;

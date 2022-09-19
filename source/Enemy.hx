@@ -1,9 +1,14 @@
+package;
+
 import flixel.FlxSprite;
-import flixel.util.FlxColor;
 
 class Enemy extends FlxSprite
 {
 	public var enemyType:EnemyType;
+
+	public var actionTimer:Float = 0;
+
+	public static var FIRE_RATE:Float = 0.8;
 
 	public function new():Void
 	{
@@ -14,8 +19,9 @@ class Enemy extends FlxSprite
 	{
 		reset(X, Y);
 		enemyType = EnemyType;
+		actionTimer = 0;
 		// loadGraphic(enemyType.image, true, true, 16, 16);
-		makeGraphic(16, 16, switch (enemyType)
+		makeGraphic(8, 8, switch (enemyType)
 		{
 			case FLYER: 0xffac3232;
 			case WALKER: 0xff76428a;
@@ -33,11 +39,20 @@ class Enemy extends FlxSprite
 				velocity.x = -100;
 				velocity.y = Math.cos(x * .05) * 100;
 
-				
-
 			case WALKER:
 
 			case SHOOTER:
+				actionTimer += elapsed;
+				if (actionTimer > FIRE_RATE)
+				{
+					actionTimer -= FIRE_RATE;
+					// on a timer, aim at the player and fire a bullet
+					var dx:Float = Globals.State.player.x - x;
+					var dy:Float = Globals.State.player.y - y;
+
+					var angle:Float = Math.atan2(dy, dx);
+					Globals.State.fireEnemyBullet(x, y, angle);
+				}
 		}
 	}
 }

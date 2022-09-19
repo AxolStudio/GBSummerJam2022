@@ -13,20 +13,20 @@
             "scaleInEditor": 1
         },
         "world_01.tmx": {
-            "scale": 0.95849609375,
-            "selectedLayer": 1,
+            "scale": 3,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 2127.812531839022,
-                "y": 1120.5053489556801
+                "x": 519.5,
+                "y": 278.3333333333333
             }
         },
         "world_01.tmx#enemies": {
             "dynamicWrapping": true,
-            "scaleInDock": 1
+            "scaleInDock": 8
         },
         "world_01.tmx#world_01": {
             "dynamicWrapping": false,
-            "scaleInDock": 1
+            "scaleInDock": 8
         },
         "world_01.tsx": {
             "dynamicWrapping": false,
@@ -38,16 +38,14 @@
     "last.imagePath": "E:/Owner/Documents/GBSummerJam2022/GBSummerJam2022/raw/maps",
     "map.lastUsedExportFilter": "CSV files (*.csv)",
     "openFiles": [
-        "world_01.tmx",
-        "world_01.tsx",
-        "enemies.tsx"
+        "world_01.tmx"
     ],
     "project": "gbsummerjam.tiled-project",
     "property.type": "string",
     "recentFiles": [
+        "world_01.tmx",
         "enemies.tsx",
-        "world_01.tsx",
-        "world_01.tmx"
+        "world_01.tsx"
     ],
     "tileset.lastUsedFormat": "tsx",
     "tileset.type": 1

@@ -1,3 +1,5 @@
+package;
+
 import axollib.AxolAPI;
 import flixel.FlxG;
 import flixel.FlxState;
@@ -15,6 +17,8 @@ class Globals
 	static private var AXOL_KEY:String = StringTools.replace(axolBytes.readUTFBytes(axolBytes.length), "\n", "");
 
 	public static var gameInitialized:Bool = false;
+
+	public static var State:PlayState;
 
 	// DB32 COLOR PALETTE
 	public static var COLORS:Array<FlxColor> = [
