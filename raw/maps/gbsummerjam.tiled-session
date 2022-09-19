@@ -13,16 +13,17 @@
             "scaleInEditor": 1
         },
         "world_01.tmx": {
-            "scale": 3,
+            "scale": 4,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 519.5,
-                "y": 278.3333333333333
+                "x": 2608.875,
+                "y": 557.5
             }
         },
         "world_01.tmx#enemies": {
             "dynamicWrapping": true,
-            "scaleInDock": 8
+            "scaleInDock": 8,
+            "scaleInEditor": 1
         },
         "world_01.tmx#world_01": {
             "dynamicWrapping": false,

@@ -1,5 +1,6 @@
 package;
 
+import flixel.FlxCamera;
 import flixel.FlxSprite;
 
 class Enemy extends FlxSprite
@@ -26,6 +27,7 @@ class Enemy extends FlxSprite
 			case FLYER: 0xffac3232;
 			case WALKER: 0xff76428a;
 			case SHOOTER: 0xffdf7126;
+			case BOSS: 0xff5fcde4;
 		}, false, enemyType);
 	}
 
@@ -57,6 +59,7 @@ class Enemy extends FlxSprite
 						Globals.State.fireEnemyBullet(x, y, angle);
 					}
 				}
+			case BOSS:
 		}
 	}
 }
@@ -66,4 +69,5 @@ class Enemy extends FlxSprite
 	var FLYER = "FLYER";
 	var WALKER = "WALKER";
 	var SHOOTER = "SHOOTER";
+	var BOSS = "BOSS";
 }

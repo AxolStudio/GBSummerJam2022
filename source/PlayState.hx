@@ -21,7 +21,7 @@ import flixel.util.FlxDirectionFlags;
 class PlayState extends FlxState
 {
 	public static var WORLD_WIDTH:Int = 4256;
-	public static var WORLD_HEIGHT:Int = 2600;
+	public static var WORLD_HEIGHT:Int = 1120;
 
 	public static var SCREEN_WIDTH:Int = 426;
 	public static var SCREEN_HEIGHT:Int = 240;

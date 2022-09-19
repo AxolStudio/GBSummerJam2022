@@ -18,6 +18,8 @@ class Player extends FlxSprite
 	public static var TRANS_COOLDOWN_TIME:Float = .5;
 	public static var LASER_COOLDOWN_TIME:Float = .5;
 
+	public static var SHIP_HEAL_DELAY:Float = 1;
+
 	public static var MAX_HEALTH:Float = 100;
 
 	public var thrustMax:Float = .5;
@@ -31,6 +33,7 @@ class Player extends FlxSprite
 
 	public var shipHealth:Float;
 	public var mechHealth:Float;
+	public var shipHealTime:Float = -1;
 
 	public function new():Void
 	{
@@ -55,6 +58,7 @@ class Player extends FlxSprite
 			if (shipHealth <= 0)
 			{
 				shipHealth = 0;
+				shipHealTime = SHIP_HEAL_DELAY;
 				switchMode();
 			}
 		}
@@ -82,9 +86,14 @@ class Player extends FlxSprite
 		{
 			if (shipHealth < MAX_HEALTH)
 			{
-				shipHealth += elapsed;
-				if (shipHealth > MAX_HEALTH)
-					shipHealth = MAX_HEALTH;
+				if (shipHealTime > 0)
+					shipHealTime -= elapsed;
+				else
+				{
+					shipHealth += elapsed;
+					if (shipHealth > MAX_HEALTH)
+						shipHealth = MAX_HEALTH;
+				}
 			}
 		}
 
@@ -96,7 +105,7 @@ class Player extends FlxSprite
 
 	public function switchMode():Void
 	{
-		if (transCooldown > 0)
+		if (transCooldown > 0 || (mode == MECH && shipHealth < 10))
 			return;
 
 		transCooldown = TRANS_COOLDOWN_TIME;
