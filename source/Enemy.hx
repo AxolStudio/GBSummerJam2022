@@ -32,7 +32,8 @@ class Enemy extends FlxSprite
 			case FLYER:
 				velocity.x = -100;
 				velocity.y = Math.cos(x * .05) * 100;
-				trace(velocity.y);
+
+				
 
 			case WALKER:
 

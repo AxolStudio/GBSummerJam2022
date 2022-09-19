@@ -1,7 +1,9 @@
 package;
 
 import Enemy.EnemyType;
+import djFlixel.gfx.StarfieldSimple;
 import flixel.FlxCamera.FlxCameraFollowStyle;
+import flixel.FlxCamera;
 import flixel.FlxG;
 import flixel.FlxObject;
 import flixel.FlxSprite;
@@ -13,15 +15,27 @@ import flixel.math.FlxMath;
 import flixel.text.FlxText;
 import flixel.tile.FlxBaseTilemap.FlxTilemapAutoTiling;
 import flixel.tile.FlxTilemap;
+import flixel.util.FlxColor;
 import flixel.util.FlxDirectionFlags;
+import js.html.Worker;
 
 class PlayState extends FlxState
 {
+	public static var WORLD_WIDTH:Int = 4256;
+	public static var WORLD_HEIGHT:Int = 2600;
+
+	public static var SCREEN_WIDTH:Int = 426;
+	public static var SCREEN_HEIGHT:Int = 240;
+
 	public static var GRAVITY:Float = 2200;
 
 	public var player:Player;
+
 	public var bg:FlxSprite;
 	public var level:TiledLevel;
+
+	public var mapA:FlxTilemap;
+	public var mapB:FlxTilemap;
 
 	public var playerAttacks:FlxTypedGroup<PlayerLaser>;
 	public var enemies:FlxTypedGroup<Enemy>;
@@ -38,9 +52,12 @@ class PlayState extends FlxState
 	public var thrustBar:FlxSprite;
 	public var thrustBarBG:FlxSprite;
 
+	public var stars:StarfieldSimple;
+
 	override public function create()
 	{
-		add(bg = FlxGridOverlay.create(16, 16, FlxG.width * 5, -1, true, Globals.COLORS[0], Globals.COLORS[1]));
+		add(stars = new StarfieldSimple(SCREEN_WIDTH, SCREEN_HEIGHT, [0xff222034, 0xff5fcde4, 0xffffffff, 0xfffbf236]));
+		stars.scrollFactor.set();
 
 		add(mapLayer = new FlxTypedGroup<FlxTilemap>());
 		add(playerAttacks = new FlxTypedGroup<PlayerLaser>());
@@ -48,15 +65,22 @@ class PlayState extends FlxState
 
 		level = new TiledLevel("assets/data/world_01.tmx", this);
 
+		mapA.y = mapB.y = 0;
+		mapA.x = 0;
+		mapB.x = mapA.x - mapB.width;
+
 		add(player = new Player());
 
 		player.x = 40;
 		player.y = (FlxG.height / 2) - (player.height / 2);
 
+		FlxG.camera.follow(player, FlxCameraFollowStyle.LOCKON);
+		FlxG.camera.setScrollBoundsRect(-WORLD_WIDTH, 0, WORLD_WIDTH * 3, SCREEN_HEIGHT, true);
+
 		add(ui = new FlxGroup());
 		buildUI();
 
-		FlxG.camera.follow(player, FlxCameraFollowStyle.LOCKON);
+		transferObjects();
 
 		super.create();
 
@@ -152,6 +176,65 @@ class PlayState extends FlxState
 		checkBounds();
 
 		updateUI();
+
+		updatePlayerPos();
+
+		stars.STAR_SPEED = (player.velocity.x / Player.MAX_SHIP_SPEED);
+	}
+
+	public function updatePlayerPos():Void
+	{
+		if (player.x > WORLD_WIDTH)
+		{
+			player.x -= WORLD_WIDTH;
+		}
+		else if (player.x < 0)
+		{
+			player.x += WORLD_WIDTH;
+		}
+
+		if (player.x > WORLD_WIDTH / 2)
+		{
+			mapB.x = mapA.x + mapA.width;
+			transferObjects();
+		}
+		else if (player.y < WORLD_WIDTH / 2)
+		{
+			mapB.x = mapA.x - mapB.width;
+			transferObjects();
+		}
+	}
+
+	public function transferObjects():Void
+	{
+		if (player.x < SCREEN_WIDTH)
+		{
+			for (e in enemies.members.filter((e) ->
+			{
+				return e.alive && e.x > WORLD_WIDTH - SCREEN_WIDTH;
+			}))
+				e.x -= WORLD_WIDTH;
+
+			for (l in playerAttacks.members.filter((l) ->
+			{
+				return l.alive && l.x > WORLD_WIDTH - SCREEN_WIDTH;
+			}))
+				l.x -= WORLD_WIDTH;
+		}
+		else if (player.x > WORLD_WIDTH - SCREEN_WIDTH)
+		{
+			for (e in enemies.members.filter((e) ->
+			{
+				return e.alive && e.x < SCREEN_WIDTH;
+			}))
+				e.x += WORLD_WIDTH;
+
+			for (l in playerAttacks.members.filter((l) ->
+			{
+				return l.alive && l.x < SCREEN_WIDTH;
+			}))
+				l.x += WORLD_WIDTH;
+		}
 	}
 
 	public function updateUI()
@@ -196,14 +279,14 @@ class PlayState extends FlxState
 
 	public function checkBounds():Void
 	{
-		if (player.x < 2)
-		{
-			player.x = 2;
-		}
-		else if (player.x > FlxG.worldBounds.width - player.width - 2)
-		{
-			player.x = FlxG.worldBounds.width - player.width - 2;
-		}
+		// if (player.x < 2)
+		// {
+		// 	player.x = 2;
+		// }
+		// else if (player.x > FlxG.worldBounds.width - player.width - 2)
+		// {
+		// 	player.x = FlxG.worldBounds.width - player.width - 2;
+		// }
 
 		if (player.y < 2)
 		{

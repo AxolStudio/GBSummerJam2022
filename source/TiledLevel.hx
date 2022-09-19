@@ -15,8 +15,6 @@ class TiledLevel extends TiledMap
 	{
 		super(Level);
 
-		FlxG.camera.setScrollBoundsRect(0, 0, fullWidth, FlxG.height, true);
-
 		loadObjects(State);
 		loadTiles(State);
 	}
@@ -48,7 +46,12 @@ class TiledLevel extends TiledMap
 			var tilemap = new FlxTilemap();
 			tilemap.loadMapFromArray(tileLayer.tileArray, width, height, processedPath, tileSet.tileWidth, tileSet.tileHeight, OFF, tileSet.firstGID, 1, 1);
 
-			State.mapLayer.add(tilemap);
+			State.mapLayer.add(State.mapA = tilemap);
+
+			tilemap = new FlxTilemap();
+			tilemap.loadMapFromArray(tileLayer.tileArray, width, height, processedPath, tileSet.tileWidth, tileSet.tileHeight, OFF, tileSet.firstGID, 1, 1);
+
+			State.mapLayer.add(State.mapB = tilemap);
 		}
 	}
 

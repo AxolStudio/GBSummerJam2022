@@ -34,6 +34,8 @@ class Globals
 
 		Actions.init();
 
+		FlxG.camera.pixelPerfectRender = true;
+
 		gameInitialized = true;
 	}
 

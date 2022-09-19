@@ -21,6 +21,7 @@
             }
         },
         "world_01.tmx#enemies": {
+            "dynamicWrapping": true,
             "scaleInDock": 1
         },
         "world_01.tmx#world_01": {
