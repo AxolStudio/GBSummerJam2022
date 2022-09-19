@@ -42,16 +42,20 @@ class Enemy extends FlxSprite
 			case WALKER:
 
 			case SHOOTER:
-				actionTimer += elapsed;
-				if (actionTimer > FIRE_RATE)
+				if (isOnScreen() || y < PlayState.SCREEN_HEIGHT)
 				{
-					actionTimer -= FIRE_RATE;
-					// on a timer, aim at the player and fire a bullet
-					var dx:Float = Globals.State.player.x - x;
-					var dy:Float = Globals.State.player.y - y;
+					actionTimer += elapsed;
+					if (actionTimer > FIRE_RATE)
+					{
+						actionTimer -= FIRE_RATE;
+						// on a timer, aim at the player and fire a bullet
+						var dx:Float = Globals.State.player.x - x;
+						var dy:Float = Globals.State.player.y - y;
 
-					var angle:Float = Math.atan2(dy, dx);
-					Globals.State.fireEnemyBullet(x, y, angle);
+						var angle:Float = Math.atan2(dy, dx);
+
+						Globals.State.fireEnemyBullet(x, y, angle);
+					}
 				}
 		}
 	}

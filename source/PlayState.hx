@@ -74,6 +74,8 @@ class PlayState extends FlxState
 
 		level = new TiledLevel("assets/data/world_01.tmx", this);
 
+		FlxG.worldBounds.set(-SCREEN_WIDTH, 0, WORLD_WIDTH + (SCREEN_WIDTH * 2), WORLD_HEIGHT);
+
 		mapA.y = mapB.y = 0;
 		mapA.x = 0;
 		mapB.x = mapA.x - mapB.width;
@@ -85,7 +87,7 @@ class PlayState extends FlxState
 
 		FlxG.camera.focusOn(player.getMidpoint());
 		FlxG.camera.follow(player, FlxCameraFollowStyle.LOCKON);
-		FlxG.camera.setScrollBoundsRect(-WORLD_WIDTH, 0, WORLD_WIDTH * 3, SCREEN_HEIGHT, true);
+		FlxG.camera.setScrollBounds(-SCREEN_WIDTH, WORLD_WIDTH + (SCREEN_WIDTH * 2), 0, SCREEN_HEIGHT);
 
 		add(enemyAttacks = new FlxTypedGroup<EnemyBullet>());
 
@@ -212,10 +214,12 @@ class PlayState extends FlxState
 		if (player.x > WORLD_WIDTH)
 		{
 			player.x -= WORLD_WIDTH;
+			FlxG.camera.focusOn(player.getMidpoint());
 		}
 		else if (player.x < 0)
 		{
 			player.x += WORLD_WIDTH;
+			FlxG.camera.focusOn(player.getMidpoint());
 		}
 
 		if (player.x > WORLD_WIDTH / 2)
@@ -335,15 +339,22 @@ class PlayState extends FlxState
 		}
 		else if (!isUnderground && player.y > SCREEN_HEIGHT - player.height - 2)
 		{
-			FlxG.camera.setScrollBoundsRect(-WORLD_WIDTH, 0, WORLD_WIDTH * 3, WORLD_HEIGHT, true);
+			// FlxG.camera.setScrollBounds(-SCREEN_WIDTH, WORLD_WIDTH + (SCREEN_WIDTH * 2), 0, WORLD_HEIGHT);
+			FlxG.camera.maxScrollY = WORLD_HEIGHT;
+
 			isUnderground = true;
 			FlxG.camera.followLerp = 0.2;
 		}
 		else if (isUnderground && player.y < SCREEN_HEIGHT - player.height - 2)
 		{
-			FlxG.camera.setScrollBoundsRect(-WORLD_WIDTH, 0, WORLD_WIDTH * 3, SCREEN_HEIGHT, true);
+			// FlxG.camera.setScrollBounds(-SCREEN_WIDTH, WORLD_WIDTH + (SCREEN_WIDTH * 2), 0, SCREEN_HEIGHT);
+			FlxG.camera.maxScrollY = SCREEN_HEIGHT;
+
 			isUnderground = false;
 			FlxG.camera.followLerp = 0;
+			FlxG.camera.follow(player, FlxCameraFollowStyle.LOCKON);
+
+			trace(FlxG.camera.minScrollX, FlxG.camera.maxScrollX, FlxG.camera.minScrollY, FlxG.camera.maxScrollY);
 		}
 	}
 

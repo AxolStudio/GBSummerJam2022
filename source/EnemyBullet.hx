@@ -17,12 +17,12 @@ class EnemyBullet extends FlxSprite
 	public function new():Void
 	{
 		super();
-		makeGraphic(6, 6, FlxColor.TRANSPARENT);
+		makeGraphic(8, 8, FlxColor.TRANSPARENT);
 	}
 
 	public function fire(X:Float, Y:Float, Angle:Float):Void
 	{
-		super.reset(X - 3, Y - 3);
+		super.reset(X - 4, Y - 4);
 
 		velocity.set(Std.int(SPEED * Math.cos(Angle)), Std.int(SPEED * Math.sin(Angle)));
 

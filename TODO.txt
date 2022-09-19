@@ -1,0 +1,14 @@
+- MECH attack
+- Game Over
+- make WALKER walk
+- Fix enemy map sizes
+- health pickups
+- underground boss things
+- more underground stuff? spikes? lava? switches?
+- more enemies?
+- title screen
+- menu
+- credits screen
+- music
+- sound effects
+- more levels
