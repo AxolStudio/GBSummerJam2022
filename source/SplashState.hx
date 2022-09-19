@@ -54,11 +54,9 @@ class SplashState extends FlxState
 			{
 				case 1:
 					hfLogo = new SpriteEffects('assets/images/HAXELOGO.png');
-					// hfLogo.addEffect("wave", {time: 1.75, width: 2, height: 0.6});
+
 					hfLogo.addEffect("blink", {open: true, time: 1.5}, s.nextV);
 
-					// DEV: There is a bug with the wave effect. Somehow for a frame it draws the whole thing
-					//      This is why I am delaying the adding a bit
 					new DelayCall(0.1, () ->
 					{
 						add(D.align.screen(hfLogo));

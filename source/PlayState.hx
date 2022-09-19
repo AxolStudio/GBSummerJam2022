@@ -17,7 +17,6 @@ import flixel.tile.FlxBaseTilemap.FlxTilemapAutoTiling;
 import flixel.tile.FlxTilemap;
 import flixel.util.FlxColor;
 import flixel.util.FlxDirectionFlags;
-import js.html.Worker;
 
 class PlayState extends FlxState
 {
