@@ -1,6 +1,7 @@
 package;
 
 import flixel.FlxCamera;
+import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.math.FlxPoint;
 import flixel.tile.FlxTilemap;
@@ -13,6 +14,8 @@ class Enemy extends FlxSprite
 	public var actionTimer:Float = 0;
 
 	public static var FIRE_RATE:Float = 2;
+
+	public var hurtCooldown:Float = 0;
 
 	private var coordD:FlxPoint = new FlxPoint();
 	private var coordF:FlxPoint = new FlxPoint();
@@ -36,6 +39,13 @@ class Enemy extends FlxSprite
 			case SHOOTER: 0xffdf7126;
 			case BOSS: 0xff5fcde4;
 		}, false, enemyType);
+		if (enemyType == BOSS)
+		{
+			health = 50;
+			hurtCooldown = 0;
+		}
+		else
+			health = 1;
 	}
 
 	override function update(elapsed:Float)
@@ -75,6 +85,8 @@ class Enemy extends FlxSprite
 					}
 				}
 			case BOSS:
+				if (hurtCooldown > 0)
+					hurtCooldown -= elapsed;
 		}
 	}
 
@@ -96,6 +108,25 @@ class Enemy extends FlxSprite
 
 		if (tileBelow != 2 || tileAhead == 2)
 			facing = facing == FlxDirection.LEFT ? FlxDirection.RIGHT : FlxDirection.LEFT;
+	}
+
+	override function kill():Void
+	{
+		super.kill();
+		if (FlxG.random.bool(20))
+		{
+			Globals.State.dropHealth(x, y);
+		}
+	}
+
+	override function hurt(Damage:Float)
+	{
+		if (hurtCooldown > 0)
+			return;
+
+		hurtCooldown = 0.5;
+
+		super.hurt(Damage);
 	}
 }
 

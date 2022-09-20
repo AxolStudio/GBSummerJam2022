@@ -2,20 +2,13 @@ package;
 
 import Enemy.EnemyType;
 import djFlixel.gfx.StarfieldSimple;
-import flixel.FlxCamera.FlxCameraFollowStyle;
 import flixel.FlxCamera;
 import flixel.FlxG;
-import flixel.FlxObject;
 import flixel.FlxSprite;
 import flixel.FlxState;
-import flixel.addons.display.FlxGridOverlay;
-import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.group.FlxGroup;
 import flixel.math.FlxMath;
-import flixel.text.FlxText;
-import flixel.tile.FlxBaseTilemap.FlxTilemapAutoTiling;
 import flixel.tile.FlxTilemap;
-import flixel.util.FlxColor;
 import flixel.util.FlxDirectionFlags;
 
 class PlayState extends FlxState
@@ -42,6 +35,7 @@ class PlayState extends FlxState
 	public var enemies:FlxTypedGroup<Enemy>;
 	public var mapLayer:FlxTypedGroup<FlxTilemap>;
 	public var enemyAttacks:FlxTypedGroup<EnemyBullet>;
+	public var healthPickups:FlxTypedGroup<Health>;
 
 	public var ui:FlxGroup;
 
@@ -90,6 +84,7 @@ class PlayState extends FlxState
 		FlxG.camera.setScrollBounds(-SCREEN_WIDTH, WORLD_WIDTH + (SCREEN_WIDTH * 2), 0, SCREEN_HEIGHT);
 
 		add(enemyAttacks = new FlxTypedGroup<EnemyBullet>());
+		add(healthPickups = new FlxTypedGroup<Health>());
 
 		add(ui = new FlxGroup());
 		buildUI();
@@ -97,10 +92,6 @@ class PlayState extends FlxState
 		transferObjects();
 
 		super.create();
-
-		FlxG.watch.add(player, "acceleration", "acceleration");
-		FlxG.watch.add(player, "velocity", "velocity");
-		FlxG.watch.add(player, "thrust", "thrust");
 	}
 
 	public function buildUI():Void
@@ -143,6 +134,17 @@ class PlayState extends FlxState
 		thrustBar.y = 17;
 		thrustBar.scrollFactor.set();
 		thrustBar.origin.x = 0;
+	}
+
+	public function dropHealth(X:Float, Y:Float):Void
+	{
+		var health:Health = healthPickups.getFirstAvailable(Health);
+		if (health == null)
+		{
+			health = new Health();
+			healthPickups.add(health);
+		}
+		health.spawn(X + 2, Y + 1);
 	}
 
 	public function fireEnemyBullet(X:Float, Y:Float, Angle:Float):Void
@@ -215,6 +217,8 @@ class PlayState extends FlxState
 		FlxG.overlap(playerAttacks, enemies, playerAttackHitEnemy, didPlayerAttackHitEnemy);
 		FlxG.overlap(enemyAttacks, player, enemyAttackHitPlayer, didEnemyAttackHitPlayer);
 
+		FlxG.overlap(player, healthPickups, playerHitHealth, didPlayerHitHealth);
+
 		updateMovement(elapsed);
 
 		checkBounds();
@@ -224,6 +228,29 @@ class PlayState extends FlxState
 		updatePlayerPos();
 
 		stars.STAR_SPEED = (player.velocity.x / Player.MAX_SHIP_SPEED);
+	}
+
+	private function didPlayerHitHealth(Player:Player, Health:Health):Bool
+	{
+		return Player.alive && Health.alive;
+	}
+
+	private function playerHitHealth(P:Player, H:Health):Void
+	{
+		H.kill();
+
+		if (P.mechHealth < Player.MAX_HEALTH)
+		{
+			P.mechHealth += 20;
+			if (P.mechHealth > Player.MAX_HEALTH)
+				P.mechHealth = Player.MAX_HEALTH;
+		}
+		else if (P.shipHealth < Player.MAX_HEALTH)
+		{
+			P.shipHealth += 20;
+			if (P.shipHealth > Player.MAX_HEALTH)
+				P.shipHealth = Player.MAX_HEALTH;
+		}
 	}
 
 	public function updatePlayerPos():Void
@@ -308,8 +335,13 @@ class PlayState extends FlxState
 
 	private function enemyHitPlayer(E:Enemy, P:Player):Void
 	{
-		P.hurt(10);
-		E.kill();
+		if (E.enemyType != BOSS)
+		{
+			P.hurt(10);
+			E.kill();
+		}
+		else
+			P.hurt(100);
 	}
 
 	private function didEnemyHitPlayer(E:Enemy, P:Player):Bool
@@ -317,13 +349,21 @@ class PlayState extends FlxState
 		return E.alive && P.alive;
 	}
 
-	private function playerAttackHitEnemy(L:PlayerLaser, E:Enemy):Void
+	private function playerAttackHitEnemy(L:FlxSprite, E:Enemy):Void
 	{
-		E.kill();
-		L.kill();
+		if (E.enemyType != BOSS)
+		{
+			E.kill();
+		}
+		else
+		{
+			E.hurt(10);
+		}
+		if (Std.is(L, PlayerLaser))
+			L.kill();
 	}
 
-	private function didPlayerAttackHitEnemy(L:PlayerLaser, E:Enemy):Bool
+	private function didPlayerAttackHitEnemy(L:FlxSprite, E:Enemy):Bool
 	{
 		return L.alive && E.alive;
 	}

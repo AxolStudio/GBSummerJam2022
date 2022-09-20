@@ -2,8 +2,9 @@
 - Game Over
 / make WALKER walk
 / Fix enemy map sizes
-- health pickups
-- underground boss things
+/ health pickups
+/ underground boss 
+- make bosses do things
 - more underground stuff? spikes? lava? switches?
 - more enemies?
 / title screen
