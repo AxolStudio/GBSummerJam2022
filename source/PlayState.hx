@@ -2,6 +2,7 @@ package;
 
 import Enemy.EnemyType;
 import djFlixel.gfx.StarfieldSimple;
+import djFlixel.gfx.Stripes;
 import flixel.FlxCamera;
 import flixel.FlxG;
 import flixel.FlxSprite;
@@ -49,6 +50,10 @@ class PlayState extends FlxState
 	public var thrustBarBG:FlxSprite;
 
 	public var stars:StarfieldSimple;
+
+	public var bossCounter:Array<FlxSprite>;
+
+	public var leaving:Bool = false;
 
 	override public function create()
 	{
@@ -134,6 +139,18 @@ class PlayState extends FlxState
 		thrustBar.y = 17;
 		thrustBar.scrollFactor.set();
 		thrustBar.origin.x = 0;
+
+		var bossCount:Int = enemies.members.filter((e) -> e.enemyType == BOSS && e.alive).length;
+		bossCounter = [];
+		var icon:FlxSprite;
+		for (i in 0...bossCount)
+		{
+			icon = new FlxSprite(FlxG.width - 10 - (i * 8), 2);
+			icon.makeGraphic(6, 6, 0xff5fcde4);
+			icon.scrollFactor.set();
+			bossCounter.push(icon);
+			ui.add(icon);
+		}
 	}
 
 	public function dropHealth(X:Float, Y:Float):Void
@@ -207,6 +224,9 @@ class PlayState extends FlxState
 	{
 		super.update(elapsed);
 
+		if (leaving)
+			return;
+
 		Globals.gameTimer += elapsed;
 
 		FlxG.collide(mapLayer, enemyAttacks, onEnemyAttackHitWall);
@@ -228,6 +248,16 @@ class PlayState extends FlxState
 		updatePlayerPos();
 
 		stars.STAR_SPEED = (player.velocity.x / Player.MAX_SHIP_SPEED);
+
+		if (!player.alive)
+		{
+			leaving = true;
+			Stripes.CREATE(() -> Globals.gotoState(LoseState), {
+				mode: "on,out",
+				color: 0xffac3232,
+				snd: "hihat"
+			});
+		}
 	}
 
 	private function didPlayerHitHealth(Player:Player, Health:Health):Bool
@@ -339,6 +369,21 @@ class PlayState extends FlxState
 		{
 			P.hurt(10);
 			E.kill();
+			if (!E.alive)
+			{
+				var e:FlxSprite = bossCounter.pop();
+				e.kill();
+				if (bossCounter.length == 0)
+				{
+					// game win!
+					leaving = true;
+					Stripes.CREATE(() -> Globals.gotoState(WinState), {
+						mode: "on,in",
+						color: Globals.COLORS[1],
+						snd: "hihat"
+					});
+				}
+			}
 		}
 		else
 			P.hurt(100);

@@ -30,7 +30,7 @@ class TitleState extends FlxState
 	public var stars:StarfieldSimple;
 
 	public var mask:FlxSprite;
-	public var colors:BitmapData;
+	public var colors:FlxSprite;
 	public var colorSprite:FlxSprite;
 	public var overlay:FlxSprite;
 	public var copy:FlxSprite;
@@ -64,14 +64,7 @@ class TitleState extends FlxState
 		addLetter("M");
 		addLetter("A2");
 
-		var c:Array<FlxColor> = [
-			0xffac3232, 0xff76428a, 0xffd95763, 0xff5b6ee1, 0xff37946e, 0xffdf7126, 0xffd77bba, 0xff639bff, 0xffd9a066, 0xff6abe30, 0xff5fcde4, 0xff99e550,
-			0xfffbf236
-		];
-		ArraySort.sort(c, (a, b) -> Std.int(a.hue - b.hue));
-		c.push(c[0]);
-
-		colors = FlxGradient.createGradientBitmapData(FlxG.width, 1, c, 1, 0, false);
+		colors = new FlxSprite("assets/images/rainbow_bar.png");
 		mask = new FlxSprite("assets/images/MASK.png");
 
 		colorSprite = new FlxSprite();
@@ -98,7 +91,7 @@ class TitleState extends FlxState
 		m.createPage('main')
 			.add('
             -|New Game  |link|id_newGame
-            -|Credits   |link|id_credits' #if !html5
+            -|About   |link|id_credits' #if !html5
 				+ '-|Quit      |link|id_quit | ?pop=Really?:Yes:No' #end);
 
 		m.STP.item_pad = 2;
@@ -107,7 +100,7 @@ class TitleState extends FlxState
 			f: "assets/fonts/skullboy.ttf",
 			s: 16,
 			bt: 2,
-			bc: 0xff45283c
+			bc: 0xff000000
 		};
 		m.STP.item.col_t = {
 			idle: FlxColor.WHITE,
@@ -262,12 +255,12 @@ class TitleState extends FlxState
 
 	public function transferColors():Void
 	{
-		var start:Int = Std.int(FlxG.game.ticks / 10) % colors.width;
+		var start:Int = Std.int(FlxG.game.ticks / 10) % Std.int(colors.width);
 		for (y in 0...Std.int(colorSprite.height))
 		{
 			for (x in 0...Std.int(colorSprite.width))
 			{
-				var color:FlxColor = colors.getPixel32((start + x + y) % colors.width, 0);
+				var color:FlxColor = colors.pixels.getPixel32((start + x + y) % Std.int(colors.width), 0);
 				var maskColor:FlxColor = mask.pixels.getPixel32(x, y);
 				if (maskColor.alpha > 0)
 				{
