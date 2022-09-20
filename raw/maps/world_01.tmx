@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.9" tiledversion="1.9.1" orientation="orthogonal" renderorder="right-down" width="532" height="140" tilewidth="8" tileheight="8" infinite="0" nextlayerid="4" nextobjectid="126">
+<map version="1.9" tiledversion="1.9.1" orientation="orthogonal" renderorder="right-down" width="532" height="140" tilewidth="8" tileheight="8" infinite="0" nextlayerid="4" nextobjectid="127">
  <tileset firstgid="1" name="world_01" tilewidth="8" tileheight="8" tilecount="2" columns="2">
   <image source="tiles.png" width="16" height="8"/>
  </tileset>
@@ -56,7 +56,7 @@
   <object id="54" gid="4" x="904" y="176" width="8" height="8"/>
   <object id="55" gid="4" x="576" y="192" width="8" height="8"/>
   <object id="56" gid="4" x="344" y="176" width="8" height="8"/>
-  <object id="57" gid="4" x="216" y="144" width="8" height="8"/>
+  <object id="57" gid="4" x="808" y="200" width="8" height="8"/>
   <object id="58" gid="4" x="2976" y="192" width="8" height="8"/>
   <object id="59" gid="4" x="3000" y="192" width="8" height="8"/>
   <object id="60" gid="4" x="2704" y="176" width="8" height="8"/>
@@ -81,12 +81,8 @@
   <object id="80" gid="3" x="3880" y="152" width="8" height="8"/>
   <object id="81" gid="3" x="3768" y="104" width="8" height="8"/>
   <object id="82" gid="3" x="4032" y="168" width="8" height="8"/>
-  <object id="83" gid="3" x="680" y="48" width="8" height="8"/>
-  <object id="84" gid="3" x="680" y="88" width="8" height="8"/>
-  <object id="85" gid="3" x="728" y="48" width="8" height="8"/>
-  <object id="86" gid="3" x="728" y="88" width="8" height="8"/>
-  <object id="87" gid="3" x="488" y="64" width="8" height="8"/>
-  <object id="88" gid="3" x="576" y="64" width="8" height="8"/>
+  <object id="87" gid="3" x="632" y="128" width="8" height="8"/>
+  <object id="88" gid="3" x="720" y="128" width="8" height="8"/>
   <object id="89" gid="3" x="944" y="56" width="8" height="8"/>
   <object id="90" gid="3" x="992" y="56" width="8" height="8"/>
   <object id="91" gid="5" x="1240" y="232" width="8" height="8"/>
@@ -119,5 +115,6 @@
   <object id="123" gid="6" x="3040" y="536" width="8" height="8"/>
   <object id="124" gid="6" x="3176" y="432" width="8" height="8"/>
   <object id="125" gid="4" x="3512" y="296" width="8" height="8"/>
+  <object id="126" gid="5" x="224" y="144" width="8" height="8"/>
  </objectgroup>
 </map>

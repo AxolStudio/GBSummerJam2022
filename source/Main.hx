@@ -12,7 +12,7 @@ class Main extends Sprite
 	{
 		super();
 
-		AxolAPI.firstState = PlayState;
+		AxolAPI.firstState = TitleState;
 		AxolAPI.init = Globals.initGame;
 
 		D.init({

@@ -1,7 +1,7 @@
 - MECH attack
 - Game Over
 - make WALKER walk
-- Fix enemy map sizes
+/ Fix enemy map sizes
 - health pickups
 - underground boss things
 - more underground stuff? spikes? lava? switches?
@@ -12,3 +12,4 @@
 - music
 - sound effects
 - more levels
+- boss counter on ui

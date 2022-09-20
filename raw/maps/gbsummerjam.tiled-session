@@ -13,11 +13,11 @@
             "scaleInEditor": 1
         },
         "world_01.tmx": {
-            "scale": 4,
+            "scale": 1.5,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 2608.875,
-                "y": 557.5
+                "x": 2578.333333333333,
+                "y": 343.3333333333333
             }
         },
         "world_01.tmx#enemies": {
