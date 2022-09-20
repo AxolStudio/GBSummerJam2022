@@ -8,16 +8,16 @@ class EnemyBullet extends FlxSprite
 {
 	public var colors:Array<FlxColor> = [0xffd95763, 0xffdf7126];
 
-	public static var SPEED:Float = 200;
+	public static var SPEED:Float = 100;
 
-	public static var MAX_LIFESPAN:Float = 2;
+	public static var MAX_LIFESPAN:Float = 1;
 
 	public var lifespan:Float = 0;
 
 	public function new():Void
 	{
 		super();
-		makeGraphic(8, 8, FlxColor.TRANSPARENT);
+		makeGraphic(6, 6, FlxColor.TRANSPARENT);
 	}
 
 	public function fire(X:Float, Y:Float, Angle:Float):Void

@@ -2,6 +2,9 @@ package;
 
 import flixel.FlxCamera;
 import flixel.FlxSprite;
+import flixel.math.FlxPoint;
+import flixel.tile.FlxTilemap;
+import flixel.util.FlxDirection;
 
 class Enemy extends FlxSprite
 {
@@ -9,7 +12,10 @@ class Enemy extends FlxSprite
 
 	public var actionTimer:Float = 0;
 
-	public static var FIRE_RATE:Float = 0.8;
+	public static var FIRE_RATE:Float = 2;
+
+	private var coordD:FlxPoint = new FlxPoint();
+	private var coordF:FlxPoint = new FlxPoint();
 
 	public function new():Void
 	{
@@ -21,6 +27,7 @@ class Enemy extends FlxSprite
 		reset(X, Y);
 		enemyType = EnemyType;
 		actionTimer = 0;
+		facing = FlxDirection.LEFT;
 		// loadGraphic(enemyType.image, true, true, 16, 16);
 		makeGraphic(8, 8, switch (enemyType)
 		{
@@ -38,10 +45,18 @@ class Enemy extends FlxSprite
 		switch (enemyType)
 		{
 			case FLYER:
-				velocity.x = -100;
-				velocity.y = Math.cos(x * .05) * 100;
+				velocity.x = -60;
+				velocity.y = Math.cos(x * .05) * 60;
 
 			case WALKER:
+				if (isOnScreen() || y < PlayState.SCREEN_HEIGHT)
+				{
+					checkAhead(elapsed);
+
+					velocity.x = 20 * (facing == FlxDirection.LEFT ? -1 : 1);
+				}
+				else
+					velocity.x = 0;
 
 			case SHOOTER:
 				if (isOnScreen() || y < PlayState.SCREEN_HEIGHT)
@@ -50,7 +65,7 @@ class Enemy extends FlxSprite
 					if (actionTimer > FIRE_RATE)
 					{
 						actionTimer -= FIRE_RATE;
-						// on a timer, aim at the player and fire a bullet
+
 						var dx:Float = Globals.State.player.x - x;
 						var dy:Float = Globals.State.player.y - y;
 
@@ -61,6 +76,26 @@ class Enemy extends FlxSprite
 				}
 			case BOSS:
 		}
+	}
+
+	public function checkAhead(elapsed:Float):Void
+	{
+		var posX:Float = x + (facing == FlxDirection.LEFT ? -(1 + (20 * elapsed / 2)) : width + (20 * elapsed / 2));
+		var posY:Float = y;
+
+		coordD.x = posX;
+		coordD.y = posY + height + 4;
+		coordF.x = posX;
+		coordF.y = posY + (height / 2);
+
+		var whichMap:FlxTilemap = x >= 0 && x <= PlayState.WORLD_WIDTH ? Globals.State.mapA : Globals.State.mapB;
+		var below:Int = whichMap.getTileIndexByCoords(coordD);
+		var ahead:Int = whichMap.getTileIndexByCoords(coordF);
+		var tileBelow:Int = whichMap.getTileByIndex(below);
+		var tileAhead:Int = whichMap.getTileByIndex(ahead);
+
+		if (tileBelow != 2 || tileAhead == 2)
+			facing = facing == FlxDirection.LEFT ? FlxDirection.RIGHT : FlxDirection.LEFT;
 	}
 }
 

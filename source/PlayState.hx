@@ -38,7 +38,7 @@ class PlayState extends FlxState
 	public var mapA:FlxTilemap;
 	public var mapB:FlxTilemap;
 
-	public var playerAttacks:FlxTypedGroup<PlayerLaser>;
+	public var playerAttacks:FlxTypedGroup<FlxSprite>;
 	public var enemies:FlxTypedGroup<Enemy>;
 	public var mapLayer:FlxTypedGroup<FlxTilemap>;
 	public var enemyAttacks:FlxTypedGroup<EnemyBullet>;
@@ -69,7 +69,7 @@ class PlayState extends FlxState
 		bg.y = SCREEN_HEIGHT;
 
 		add(mapLayer = new FlxTypedGroup<FlxTilemap>());
-		add(playerAttacks = new FlxTypedGroup<PlayerLaser>());
+		add(playerAttacks = new FlxTypedGroup<FlxSprite>());
 		add(enemies = new FlxTypedGroup<Enemy>());
 
 		level = new TiledLevel("assets/data/world_01.tmx", this);
@@ -156,13 +156,13 @@ class PlayState extends FlxState
 		bullet.fire(X, Y, Angle);
 	}
 
-	public function fireLaser()
+	public function fireLaser():Void
 	{
 		if (player.laserCooldown > 0)
 			return;
 		player.laserCooldown = Player.LASER_COOLDOWN_TIME;
 
-		var laser:PlayerLaser = playerAttacks.getFirstAvailable(PlayerLaser);
+		var laser:PlayerLaser = cast playerAttacks.getFirstAvailable(PlayerLaser);
 		if (laser == null)
 		{
 			laser = new PlayerLaser();
@@ -170,6 +170,23 @@ class PlayState extends FlxState
 		}
 
 		laser.fire(player.x + (player.facing == FlxDirectionFlags.RIGHT ? player.width + 1 : -1), Std.int(player.y + (player.height / 2)) - 1, player.facing);
+	}
+
+	public function playerPunch():Void
+	{
+		if (player.punchCooldown > 0)
+			return;
+		player.punchCooldown = Player.PUNCH_COOLDOWN_TIME;
+		player.justPunchedCooldown = Player.JUSTPUNCHED_COOLDOWN_TIME;
+
+		var punch:PlayerPunch = cast playerAttacks.getFirstAvailable(PlayerPunch);
+		if (punch == null)
+		{
+			punch = new PlayerPunch();
+			playerAttacks.add(punch);
+		}
+
+		punch.fire();
 	}
 
 	public function addEnemy(X:Float, Y:Float, EnemyType:EnemyType):Void
@@ -401,6 +418,11 @@ class PlayState extends FlxState
 		}
 		else
 		{
+			if (Actions.attack.check())
+			{
+				playerPunch();
+			}
+
 			if (Actions.thrust.check())
 			{
 				if (player.thrust < player.thrustMax)
