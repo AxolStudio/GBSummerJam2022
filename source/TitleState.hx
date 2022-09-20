@@ -1,5 +1,8 @@
 package;
 
+#if !html5
+import lime.system.System;
+#end
 import djFlixel.D;
 import djFlixel.gfx.RainbowStripes;
 import djFlixel.gfx.SpriteEffects;
@@ -31,6 +34,9 @@ class TitleState extends FlxState
 	public var colorSprite:FlxSprite;
 	public var overlay:FlxSprite;
 	public var copy:FlxSprite;
+
+	public var mech:FlxSprite;
+	public var ship:FlxSprite;
 
 	public var doTransfer:Bool = false;
 
@@ -101,7 +107,7 @@ class TitleState extends FlxState
 			f: "assets/fonts/skullboy.ttf",
 			s: 16,
 			bt: 2,
-			bc: 0xff222034
+			bc: 0xff45283c
 		};
 		m.STP.item.col_t = {
 			idle: FlxColor.WHITE,
@@ -221,6 +227,25 @@ class TitleState extends FlxState
 					add(copy = new FlxSprite("assets/images/copyright.png"));
 					copy.x = 8;
 					copy.y = FlxG.height - copy.height - 8;
+
+					add(mech = new FlxSprite("assets/images/mech.png"));
+					mech.x = FlxG.width;
+					mech.y = FlxG.height - mech.height;
+
+					FlxTween.tween(mech, {x: copy.x + copy.width + 8}, .2, {type: FlxTweenType.ONESHOT, ease: FlxEase.quartIn});
+
+					add(ship = new FlxSprite("assets/images/ship.png"));
+					ship.x = FlxG.width;
+					ship.y = FlxG.height - ship.height;
+
+					FlxTween.tween(ship, {x: FlxG.width - ship.width - 10}, .2, {
+						type: FlxTweenType.ONESHOT,
+						ease: FlxEase.quartIn,
+						startDelay: .1,
+						onComplete: (_) -> s.next()
+					});
+
+				case 9:
 					createMenu();
 			}
 		}, 0));
