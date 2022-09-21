@@ -40,6 +40,10 @@ class Player extends FlxSprite
 	public var mechHealth:Float;
 	public var shipHealTime:Float = -1;
 
+	public var justHurt:Float = -1;
+
+	public static var JUST_HURT_TIME:Float = 0.2;
+
 	public function new():Void
 	{
 		super();
@@ -57,6 +61,8 @@ class Player extends FlxSprite
 
 	override function hurt(Damage:Float)
 	{
+		if (justHurt > 0)
+			return;
 		if (mode == SHIP)
 		{
 			shipHealth -= Damage;
@@ -76,7 +82,10 @@ class Player extends FlxSprite
 			}
 		}
 		if (alive)
+		{
 			D.snd.play('player_hit');
+			justHurt = JUST_HURT_TIME;
+		}
 		else
 			D.snd.play('title_crash');
 	}
@@ -84,6 +93,9 @@ class Player extends FlxSprite
 	override function update(elapsed:Float)
 	{
 		super.update(elapsed);
+
+		if (justHurt > 0)
+			justHurt -= elapsed;
 
 		if (transCooldown > 0)
 			transCooldown -= elapsed;

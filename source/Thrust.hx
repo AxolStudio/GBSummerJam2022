@@ -6,31 +6,30 @@ import flixel.util.FlxSpriteUtil;
 
 class Thrust extends FlxSprite
 {
-	private var size:Float = 4;
-
 	public var colors:Array<FlxColor> = [0xff5b6ee1, 0xff3f3f74];
 
 	public function new():Void
 	{
 		super();
+		loadGraphic("assets/images/thrust.png", true, 8, 8);
+		animation.add("thrust", [0, 1, 2, 3], 20, false);
+		animation.finishCallback = (_) ->
+		{
+			kill();
+		};
 	}
 
 	public function spawn(X:Float, Y:Float):Void
 	{
-		reset(X - 6, Y - 6);
-		size = 4;
+		reset(X - 4, Y - 4);
+
+		animation.play("thrust");
 	}
 
 	override function draw()
 	{
-		makeGraphic(12, 12, FlxColor.TRANSPARENT, true);
-		FlxSpriteUtil.drawCircle(this, -1, -1, Math.ceil(size), FlxColor.WHITE);
 		color = colors[Std.int(Globals.gameTimer * 10) % 2];
-		size -= 0.5;
 
-		if (size <= 0)
-			kill();
-		else
-			super.draw();
+		super.draw();
 	}
 }

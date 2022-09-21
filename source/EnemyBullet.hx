@@ -17,7 +17,7 @@ class EnemyBullet extends FlxSprite
 	public function new():Void
 	{
 		super();
-		makeGraphic(8, 8, FlxColor.TRANSPARENT);
+		loadGraphic("assets/images/enemy_bullet.png", false, 8, 8);
 	}
 
 	public function fire(X:Float, Y:Float, Angle:Float):Void
@@ -43,12 +43,7 @@ class EnemyBullet extends FlxSprite
 
 	override function draw()
 	{
-		updateGraphic();
+		color = colors[Std.int(Globals.gameTimer * 10) % 2];
 		super.draw();
-	}
-
-	public function updateGraphic():Void
-	{
-		FlxSpriteUtil.drawCircle(this, -1, -1, 2, colors[Std.int(Globals.gameTimer * 10) % 2]);
 	}
 }

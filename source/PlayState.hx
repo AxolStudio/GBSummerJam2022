@@ -12,6 +12,8 @@ import flixel.group.FlxGroup;
 import flixel.math.FlxMath;
 import flixel.system.FlxSound;
 import flixel.tile.FlxTilemap;
+import flixel.util.FlxColor;
+import flixel.util.FlxDirection;
 import flixel.util.FlxDirectionFlags;
 
 class PlayState extends FlxState
@@ -41,6 +43,7 @@ class PlayState extends FlxState
 	public var healthPickups:FlxTypedGroup<Health>;
 	public var explosions:FlxTypedGroup<Explosion>;
 	public var thrusts:FlxTypedGroup<Thrust>;
+	public var bossAttacks:FlxTypedGroup<BossAttack>;
 
 	public var ui:FlxGroup;
 
@@ -99,6 +102,7 @@ class PlayState extends FlxState
 		FlxG.camera.setScrollBounds(-SCREEN_WIDTH, WORLD_WIDTH + (SCREEN_WIDTH * 2), 0, SCREEN_HEIGHT);
 
 		add(enemyAttacks = new FlxTypedGroup<EnemyBullet>());
+		add(bossAttacks = new FlxTypedGroup<BossAttack>());
 		add(healthPickups = new FlxTypedGroup<Health>());
 
 		add(ui = new FlxGroup());
@@ -107,6 +111,17 @@ class PlayState extends FlxState
 		transferObjects();
 
 		super.create();
+	}
+
+	public function startBossAttack(X:Float, Y:Float, Facing:FlxDirection):Void
+	{
+		var attack:BossAttack = bossAttacks.getFirstAvailable();
+		if (attack == null)
+		{
+			attack = new BossAttack();
+			bossAttacks.add(attack);
+		}
+		attack.spawn(X, Y, Facing);
 	}
 
 	public function spawnThrust(X:Float, Y:Float):Void
@@ -279,6 +294,7 @@ class PlayState extends FlxState
 		FlxG.overlap(enemies, player, enemyHitPlayer, didEnemyHitPlayer);
 		FlxG.overlap(playerAttacks, enemies, playerAttackHitEnemy, didPlayerAttackHitEnemy);
 		FlxG.overlap(enemyAttacks, player, enemyAttackHitPlayer, didEnemyAttackHitPlayer);
+		FlxG.overlap(bossAttacks, player, bossAttackHitPlayer, didBossAttackHitPlayer);
 
 		FlxG.overlap(player, healthPickups, playerHitHealth, didPlayerHitHealth);
 
@@ -301,6 +317,20 @@ class PlayState extends FlxState
 				snd: "hihat"
 			});
 		}
+	}
+
+	private function didBossAttackHitPlayer(BA:BossAttack, P:Player):Bool
+	{
+		if (BA.alive && P.alive && P.justHurt <= 0)
+		{
+			return FlxG.pixelPerfectOverlap(BA, P);
+		}
+		return false;
+	}
+
+	private function bossAttackHitPlayer(BA:BossAttack, P:Player):Void
+	{
+		P.hurt(10);
 	}
 
 	private function didPlayerHitHealth(Player:Player, Health:Health):Bool

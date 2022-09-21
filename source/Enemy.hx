@@ -5,6 +5,7 @@ import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.math.FlxPoint;
 import flixel.tile.FlxTilemap;
+import flixel.util.FlxColor;
 import flixel.util.FlxDirection;
 
 class Enemy extends FlxSprite
@@ -14,6 +15,9 @@ class Enemy extends FlxSprite
 	public var actionTimer:Float = 0;
 
 	public static var FIRE_RATE:Float = 2;
+	public static var BOSS_FIRE_RATE:Float = 3;
+
+	public static var BOSS_FLASH_COLORS:Array<FlxColor> = [0xff76428a, 0xffd77bba];
 
 	public var hurtCooldown:Float = 0;
 
@@ -23,6 +27,16 @@ class Enemy extends FlxSprite
 	public function new():Void
 	{
 		super();
+
+		loadGraphic("assets/images/enemies.png", true, 8, 8);
+
+		setFacingFlip(FlxDirection.LEFT, true, false);
+		setFacingFlip(FlxDirection.RIGHT, false, false);
+
+		animation.add("FLYER", [0, 1], 10, true);
+		animation.add("WALKER", [2, 3], 10, true);
+		animation.add("SHOOTER", [4, 5], 10, true);
+		animation.add("BOSS", [6, 7], 10, true);
 	}
 
 	public function spawn(X:Float, Y:Float, EnemyType:EnemyType):Void
@@ -31,14 +45,8 @@ class Enemy extends FlxSprite
 		enemyType = EnemyType;
 		actionTimer = 0;
 		facing = FlxDirection.LEFT;
-		// loadGraphic(enemyType.image, true, true, 16, 16);
-		makeGraphic(8, 8, switch (enemyType)
-		{
-			case FLYER: 0xffac3232;
-			case WALKER: 0xff76428a;
-			case SHOOTER: 0xffdf7126;
-			case BOSS: 0xff5fcde4;
-		}, false, enemyType);
+
+		animation.play(EnemyType, true);
 		if (enemyType == BOSS)
 		{
 			health = 50;
@@ -85,9 +93,41 @@ class Enemy extends FlxSprite
 					}
 				}
 			case BOSS:
+				if (isOnScreen())
+				{
+					// can we see the player?
+					var whichMap:FlxTilemap = x >= 0 && x <= PlayState.WORLD_WIDTH ? Globals.State.mapA : Globals.State.mapB;
+					if (whichMap.ray(getMidpoint(), Globals.State.player.getMidpoint()))
+					{
+						// we can!
+						actionTimer += elapsed;
+						if (actionTimer > BOSS_FIRE_RATE)
+						{
+							actionTimer -= BOSS_FIRE_RATE;
+
+							Globals.State.startBossAttack(x + 4, y + 4, x < Globals.State.player.x ? RIGHT : LEFT);
+						}
+					}
+					else
+					{
+						actionTimer = 0;
+					}
+				}
 				if (hurtCooldown > 0)
 					hurtCooldown -= elapsed;
 		}
+	}
+
+	override function draw()
+	{
+		if (enemyType == BOSS && actionTimer > FIRE_RATE)
+		{
+			color = BOSS_FLASH_COLORS[Std.int(Globals.gameTimer * 10) % 2];
+		}
+		else
+			color = FlxColor.WHITE;
+		
+		super.draw();
 	}
 
 	public function checkAhead(elapsed:Float):Void

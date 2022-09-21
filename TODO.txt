@@ -5,7 +5,7 @@
 / Fix enemy map sizes
 / health pickups
 / underground boss 
-- make bosses do things
+/ make bosses do things
 ! more underground stuff? spikes? lava? switches?
 ! more enemies?
 / title screen
@@ -15,3 +15,6 @@
 / sound effects
 ! more levels
 / boss counter on ui
+! Boss attack sparks
+- Ship Sprites
+- Mech sprites
