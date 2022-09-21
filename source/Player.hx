@@ -1,5 +1,6 @@
 package;
 
+import djFlixel.D;
 import flixel.FlxObject;
 import flixel.FlxSprite;
 import flixel.util.FlxColor;
@@ -74,6 +75,10 @@ class Player extends FlxSprite
 				kill();
 			}
 		}
+		if (alive)
+			D.snd.play('player_hit');
+		else
+			D.snd.play('title_crash');
 	}
 
 	override function update(elapsed:Float)
@@ -123,6 +128,8 @@ class Player extends FlxSprite
 			return;
 
 		transCooldown = TRANS_COOLDOWN_TIME;
+
+		D.snd.play('transform');
 
 		if (mode == SHIP)
 		{

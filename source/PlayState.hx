@@ -1,6 +1,7 @@
 package;
 
 import Enemy.EnemyType;
+import djFlixel.D;
 import djFlixel.gfx.StarfieldSimple;
 import djFlixel.gfx.Stripes;
 import flixel.FlxCamera;
@@ -9,6 +10,7 @@ import flixel.FlxSprite;
 import flixel.FlxState;
 import flixel.group.FlxGroup;
 import flixel.math.FlxMath;
+import flixel.system.FlxSound;
 import flixel.tile.FlxTilemap;
 import flixel.util.FlxDirectionFlags;
 
@@ -37,6 +39,8 @@ class PlayState extends FlxState
 	public var mapLayer:FlxTypedGroup<FlxTilemap>;
 	public var enemyAttacks:FlxTypedGroup<EnemyBullet>;
 	public var healthPickups:FlxTypedGroup<Health>;
+	public var explosions:FlxTypedGroup<Explosion>;
+	public var thrusts:FlxTypedGroup<Thrust>;
 
 	public var ui:FlxGroup;
 
@@ -55,6 +59,10 @@ class PlayState extends FlxState
 
 	public var leaving:Bool = false;
 
+	public var thrustSnd:FlxSound;
+
+	public var punches:Array<Int> = [1, 2, 3];
+
 	override public function create()
 	{
 		Globals.State = this;
@@ -70,6 +78,7 @@ class PlayState extends FlxState
 		add(mapLayer = new FlxTypedGroup<FlxTilemap>());
 		add(playerAttacks = new FlxTypedGroup<FlxSprite>());
 		add(enemies = new FlxTypedGroup<Enemy>());
+		add(explosions = new FlxTypedGroup<Explosion>());
 
 		level = new TiledLevel("assets/data/world_01.tmx", this);
 
@@ -79,6 +88,7 @@ class PlayState extends FlxState
 		mapA.x = 0;
 		mapB.x = mapA.x - mapB.width;
 
+		add(thrusts = new FlxTypedGroup<Thrust>());
 		add(player = new Player());
 
 		player.x = 40;
@@ -97,6 +107,29 @@ class PlayState extends FlxState
 		transferObjects();
 
 		super.create();
+	}
+
+	public function spawnThrust(X:Float, Y:Float):Void
+	{
+		var thrust:Thrust = thrusts.getFirstAvailable();
+		if (thrust == null)
+		{
+			thrust = new Thrust();
+			thrusts.add(thrust);
+		}
+
+		thrust.spawn(X, Y);
+	}
+
+	public function spawnExplosion(X:Float, Y:Float):Void
+	{
+		var explosion:Explosion = explosions.getFirstAvailable();
+		if (explosion == null)
+		{
+			explosion = new Explosion();
+			explosions.add(explosion);
+		}
+		explosion.spawn(X, Y);
 	}
 
 	public function buildUI():Void
@@ -173,12 +206,17 @@ class PlayState extends FlxState
 			enemyAttacks.add(bullet);
 		}
 		bullet.fire(X, Y, Angle);
+		if (bullet.isOnScreen())
+			D.snd.play("enemy_shoot", 0.01);
 	}
 
 	public function fireLaser():Void
 	{
 		if (player.laserCooldown > 0)
 			return;
+
+		D.snd.play('laser');
+
 		player.laserCooldown = Player.LASER_COOLDOWN_TIME;
 
 		var laser:PlayerLaser = cast playerAttacks.getFirstAvailable(PlayerLaser);
@@ -195,6 +233,11 @@ class PlayState extends FlxState
 	{
 		if (player.punchCooldown > 0)
 			return;
+
+		var n:Int = punches.shift();
+		D.snd.play('punch_$n');
+		punches.push(n);
+
 		player.punchCooldown = Player.PUNCH_COOLDOWN_TIME;
 		player.justPunchedCooldown = Player.JUSTPUNCHED_COOLDOWN_TIME;
 
@@ -269,6 +312,8 @@ class PlayState extends FlxState
 	{
 		H.kill();
 
+		D.snd.play('get_health');
+
 		if (P.mechHealth < Player.MAX_HEALTH)
 		{
 			P.mechHealth += 20;
@@ -323,6 +368,30 @@ class PlayState extends FlxState
 				return l.alive && l.x > WORLD_WIDTH - SCREEN_WIDTH;
 			}))
 				l.x -= WORLD_WIDTH;
+
+			for (l in enemyAttacks.members.filter((l) ->
+			{
+				return l.alive && l.x > WORLD_WIDTH - SCREEN_WIDTH;
+			}))
+				l.x -= WORLD_WIDTH;
+
+			for (h in healthPickups.members.filter((h) ->
+			{
+				return h.alive && h.x > WORLD_WIDTH - SCREEN_WIDTH;
+			}))
+				h.x -= WORLD_WIDTH;
+
+			for (e in explosions.members.filter((e) ->
+			{
+				return e.alive && e.x > WORLD_WIDTH - SCREEN_WIDTH;
+			}))
+				e.x -= WORLD_WIDTH;
+
+			for (t in thrusts.members.filter((t) ->
+			{
+				return t.alive && t.x > WORLD_WIDTH - SCREEN_WIDTH;
+			}))
+				t.x -= WORLD_WIDTH;
 		}
 		else if (player.x > WORLD_WIDTH - SCREEN_WIDTH)
 		{
@@ -337,6 +406,30 @@ class PlayState extends FlxState
 				return l.alive && l.x < SCREEN_WIDTH;
 			}))
 				l.x += WORLD_WIDTH;
+
+			for (l in enemyAttacks.members.filter((l) ->
+			{
+				return l.alive && l.x < SCREEN_WIDTH;
+			}))
+				l.x += WORLD_WIDTH;
+
+			for (h in healthPickups.members.filter((h) ->
+			{
+				return h.alive && h.x < SCREEN_WIDTH;
+			}))
+				h.x += WORLD_WIDTH;
+
+			for (e in explosions.members.filter((e) ->
+			{
+				return e.alive && e.x < SCREEN_WIDTH;
+			}))
+				e.x += WORLD_WIDTH;
+
+			for (t in thrusts.members.filter((t) ->
+			{
+				return t.alive && t.x < SCREEN_WIDTH;
+			}))
+				t.x += WORLD_WIDTH;
 		}
 	}
 
@@ -356,11 +449,13 @@ class PlayState extends FlxState
 	private function onEnemyAttackHitWall(Map:FlxTilemap, Attack:EnemyBullet):Void
 	{
 		Attack.kill();
+		D.snd.play("wall");
 	}
 
 	private function onPlayerAttackHitMap(Map:FlxTilemap, Attack:PlayerLaser):Void
 	{
 		Attack.kill();
+		D.snd.play("wall");
 	}
 
 	private function enemyHitPlayer(E:Enemy, P:Player):Void
@@ -369,21 +464,7 @@ class PlayState extends FlxState
 		{
 			P.hurt(10);
 			E.kill();
-			if (!E.alive)
-			{
-				var e:FlxSprite = bossCounter.pop();
-				e.kill();
-				if (bossCounter.length == 0)
-				{
-					// game win!
-					leaving = true;
-					Stripes.CREATE(() -> Globals.gotoState(WinState), {
-						mode: "on,in",
-						color: Globals.COLORS[1],
-						snd: "hihat"
-					});
-				}
-			}
+			spawnExplosion(E.x + 4, E.y + 4);
 		}
 		else
 			P.hurt(100);
@@ -399,10 +480,34 @@ class PlayState extends FlxState
 		if (E.enemyType != BOSS)
 		{
 			E.kill();
+			spawnExplosion(E.x + 4, E.y + 4);
 		}
 		else
 		{
 			E.hurt(10);
+
+			if (!E.alive)
+			{
+				spawnExplosion(E.x + 4, E.y + 4);
+
+				var e:FlxSprite = bossCounter.pop();
+				e.kill();
+
+				if (bossCounter.length == 0)
+				{
+					// game win!
+					leaving = true;
+					Stripes.CREATE(() -> Globals.gotoState(WinState), {
+						mode: "on,in",
+						color: Globals.COLORS[1],
+						snd: "hihat"
+					});
+				}
+			}
+			else
+			{
+				D.snd.play("enemy_hit");
+			}
 		}
 		if (Std.is(L, PlayerLaser))
 			L.kill();
@@ -456,7 +561,7 @@ class PlayState extends FlxState
 			FlxG.camera.followLerp = 0;
 			FlxG.camera.follow(player, FlxCameraFollowStyle.LOCKON);
 
-			trace(FlxG.camera.minScrollX, FlxG.camera.maxScrollX, FlxG.camera.minScrollY, FlxG.camera.maxScrollY);
+			// trace(FlxG.camera.minScrollX, FlxG.camera.maxScrollX, FlxG.camera.minScrollY, FlxG.camera.maxScrollY);
 		}
 	}
 
@@ -500,6 +605,13 @@ class PlayState extends FlxState
 				player.thrust -= elapsed * 2;
 				player.thrust = Math.max(0, player.thrust);
 			}
+			if (thrustSnd != null)
+			{
+				if (thrustSnd.playing)
+					thrustSnd.stop();
+			}
+
+			spawnThrust(player.x + (player.facing == LEFT ? player.width : 0), player.y + 3);
 		}
 		else
 		{
@@ -514,12 +626,24 @@ class PlayState extends FlxState
 				{
 					player.velocity.y = -Player.MECH_THRUST;
 					player.thrust += elapsed;
+					thrustSnd = D.snd.play('thrust', 0.1, false, false);
+					spawnThrust(player.x + 3, player.y + player.height);
+				}
+				else if (thrustSnd != null)
+				{
+					if (thrustSnd.playing)
+						thrustSnd.stop();
 				}
 			}
 			else if (player.thrust > 0)
 			{
 				player.thrust -= elapsed * 2;
 				player.thrust = Math.max(0, player.thrust);
+				if (thrustSnd != null)
+				{
+					if (thrustSnd.playing)
+						thrustSnd.stop();
+				}
 			}
 		}
 

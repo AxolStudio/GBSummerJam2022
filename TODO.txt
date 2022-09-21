@@ -1,16 +1,17 @@
 / MECH attack
-- Game Over
+- Game Over screen
+- Game Win screen
 / make WALKER walk
 / Fix enemy map sizes
 / health pickups
 / underground boss 
 - make bosses do things
-- more underground stuff? spikes? lava? switches?
-- more enemies?
+! more underground stuff? spikes? lava? switches?
+! more enemies?
 / title screen
 / menu
-- credits screen
+/ credits screen
 - music
-- sound effects
-- more levels
-- boss counter on ui
+/ sound effects
+! more levels
+/ boss counter on ui
