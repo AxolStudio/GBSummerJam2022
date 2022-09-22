@@ -66,6 +66,9 @@ class PlayState extends FlxState
 
 	public var punches:Array<Int> = [1, 2, 3];
 
+	public var mechUI:FlxSprite;
+	public var shipUI:FlxSprite;
+
 	override public function create()
 	{
 		Globals.State = this;
@@ -151,42 +154,48 @@ class PlayState extends FlxState
 	{
 		ui.add(shipHPBarBG = new FlxSprite());
 		shipHPBarBG.makeGraphic(102, 6, 0xffac3232);
-		shipHPBarBG.x = 2;
+		shipHPBarBG.x = 6;
 		shipHPBarBG.y = 2;
 		shipHPBarBG.scrollFactor.set();
 
 		ui.add(shipHPBar = new FlxSprite());
 		shipHPBar.makeGraphic(100, 4, 0xffd95763);
-		shipHPBar.x = 3;
+		shipHPBar.x = 7;
 		shipHPBar.y = 3;
 		shipHPBar.scrollFactor.set();
 		shipHPBar.origin.x = 0;
 
+		add(shipUI = new FlxSprite(2, 2));
+		shipUI.loadGraphic("assets/images/ship_hud.png", true, 6, 6);
+		shipUI.scrollFactor.set();
+
 		ui.add(mechHPBarBG = new FlxSprite());
 		mechHPBarBG.makeGraphic(102, 6, 0xffac3232);
-		mechHPBarBG.x = 2;
+		mechHPBarBG.x = 6;
 		mechHPBarBG.y = 9;
 		mechHPBarBG.scrollFactor.set();
 
 		ui.add(mechHPBar = new FlxSprite());
 		mechHPBar.makeGraphic(100, 4, 0xffd95763);
-		mechHPBar.x = 3;
+		mechHPBar.x = 7;
 		mechHPBar.y = 10;
 		mechHPBar.scrollFactor.set();
 		mechHPBar.origin.x = 0;
 
+		add(mechUI = new FlxSprite(2, 9, "assets/images/mech_hud.png"));
+		mechUI.scrollFactor.set();
+
 		ui.add(thrustBarBG = new FlxSprite());
-		thrustBarBG.makeGraphic(102, 6, 0xff3f3f74);
-		thrustBarBG.x = 2;
-		thrustBarBG.y = 16;
-		thrustBarBG.scrollFactor.set();
+		thrustBarBG.makeGraphic(4, 12, 0xff3f3f74);
+		thrustBarBG.visible = false;
+		// thrustBarBG.x = 2;
+		// thrustBarBG.y = 16;
+		// thrustBarBG.scrollFactor.set();
 
 		ui.add(thrustBar = new FlxSprite());
-		thrustBar.makeGraphic(100, 4, 0xff639bff);
-		thrustBar.x = 3;
-		thrustBar.y = 17;
-		thrustBar.scrollFactor.set();
-		thrustBar.origin.x = 0;
+		thrustBar.makeGraphic(2, 10, 0xff639bff);
+		thrustBar.origin.y = 10;
+		thrustBar.visible = false;
 
 		var bossCount:Int = enemies.members.filter((e) -> e.enemyType == BOSS && e.alive).length;
 		bossCounter = [];
@@ -469,9 +478,23 @@ class PlayState extends FlxState
 
 	public function updateUI()
 	{
-		shipHPBar.scale.x = FlxMath.bound(player.mechHealth / Player.MAX_HEALTH, 0, 1);
-		mechHPBar.scale.x = FlxMath.bound(player.shipHealth / Player.MAX_HEALTH, 0, 1);
-		thrustBar.scale.x = FlxMath.bound(1 - (player.thrust / player.thrustMax), 0, 1);
+		shipHPBar.scale.x = FlxMath.bound(player.shipHealth / Player.MAX_HEALTH, 0, 1);
+		mechHPBar.scale.x = FlxMath.bound(player.mechHealth / Player.MAX_HEALTH, 0, 1);
+		thrustBar.scale.y = FlxMath.bound(1 - (player.thrust / player.thrustMax), 0, 1);
+		if (player.thrust > 0)
+		{
+			thrustBarBG.x = player.x + (player.facing == RIGHT ? -6 : player.width + 2);
+			thrustBarBG.y = player.y;
+			thrustBar.x = thrustBarBG.x + 1;
+			thrustBar.y = thrustBarBG.y + 1;
+			thrustBarBG.visible = thrustBar.visible = true;
+		}
+		else
+		{
+			thrustBarBG.visible = thrustBar.visible = false;
+		}
+
+		shipUI.animation.frameIndex = player.shipHealth < 10 ? 1 : 0;
 	}
 
 	private function onPlayerHitWall(T:FlxTilemap, P:Player):Void
@@ -533,7 +556,7 @@ class PlayState extends FlxState
 					leaving = true;
 					Stripes.CREATE(() -> Globals.gotoState(WinState), {
 						mode: "on,in",
-						color: Globals.COLORS[1],
+						color: 0xff639bff,
 						snd: "hihat"
 					});
 				}

@@ -73,6 +73,7 @@ class Actions
 
 		Actions.thrust.addKey(X, PRESSED);
 		Actions.transform.addKey(Z, PRESSED);
+		Actions.transform.addKey(Y, PRESSED);
 		Actions.attack.addKey(C, PRESSED);
 
 		Actions.up.addGamepad(DPAD_UP, PRESSED);

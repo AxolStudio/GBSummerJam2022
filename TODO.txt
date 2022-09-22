@@ -1,6 +1,6 @@
 / MECH attack
-- Game Over screen
-- Game Win screen
+/ Game Over screen
+/ Game Win screen
 / make WALKER walk
 / Fix enemy map sizes
 / health pickups
@@ -18,5 +18,5 @@
 ! Boss attack sparks
 / Ship Sprites
 / Mech sprites
-- Improve HUD
-- Health sprite
+/ Improve HUD
+/ Health sprite

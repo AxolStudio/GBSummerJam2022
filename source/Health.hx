@@ -12,7 +12,7 @@ class Health extends FlxSprite
 	public function new():Void
 	{
 		super();
-		makeGraphic(4, 6, 0xff99e550);
+		loadGraphic("assets/images/health.png");
 	}
 
 	public function spawn(X:Float, Y:Float):Void
@@ -29,12 +29,7 @@ class Health extends FlxSprite
 
 	override public function draw():Void
 	{
-		updateGraphic();
+		color = colors[Std.int(Globals.gameTimer * 10) % 2];
 		super.draw();
-	}
-
-	public function updateGraphic():Void
-	{
-		makeGraphic(4, 6, colors[Std.int(Globals.gameTimer * 10) % 2]);
 	}
 }

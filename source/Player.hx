@@ -176,6 +176,7 @@ class Player extends FlxSprite
 			width = 6;
 			height = 12;
 			offset.y = 0;
+			y -= 6;
 			if (facing == LEFT)
 			{
 				offset.x = 5;
