@@ -16,5 +16,7 @@
 ! more levels
 / boss counter on ui
 ! Boss attack sparks
-- Ship Sprites
-- Mech sprites
+/ Ship Sprites
+/ Mech sprites
+- Improve HUD
+- Health sprite

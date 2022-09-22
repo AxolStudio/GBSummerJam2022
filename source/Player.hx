@@ -1,9 +1,12 @@
 package;
 
 import djFlixel.D;
+import flixel.FlxCamera.FlxCameraFollowStyle;
+import flixel.FlxG;
 import flixel.FlxObject;
 import flixel.FlxSprite;
 import flixel.util.FlxColor;
+import flixel.util.FlxDirectionFlags;
 
 class Player extends FlxSprite
 {
@@ -16,7 +19,7 @@ class Player extends FlxSprite
 	public static var MECH_DRAG:Float = 2000;
 	public static var MECH_THRUST:Float = 80;
 
-	public static var TRANS_COOLDOWN_TIME:Float = .5;
+	public static var TRANS_COOLDOWN_TIME:Float = .25;
 	public static var LASER_COOLDOWN_TIME:Float = .8;
 	public static var PUNCH_COOLDOWN_TIME:Float = .25;
 	public static var JUSTPUNCHED_COOLDOWN_TIME:Float = .2;
@@ -44,19 +47,39 @@ class Player extends FlxSprite
 
 	public static var JUST_HURT_TIME:Float = 0.2;
 
+	public var animFrames:Map<String, Int> = [];
+
 	public function new():Void
 	{
 		super();
 
 		mechHealth = shipHealth = MAX_HEALTH;
 
-		makeGraphic(12, 6, FlxColor.WHITE);
+		// makeGraphic(12, 6, FlxColor.WHITE);
+		loadGraphic("assets/images/player.png", true, 12, 12);
+
+		animFrames.set("ship", 0);
+		animFrames.set("step-1", 1);
+		animFrames.set("step-2", 2);
+		animFrames.set("punch-1", 3);
+		animFrames.set("punch-2", 4);
+		animFrames.set("transform", 5);
+
+		setFacingFlip(LEFT, true, false);
+		setFacingFlip(RIGHT, false, false);
+
+		animation.frameIndex = animFrames.get("ship");
+		width = 12;
+		height = 6;
+		offset.x = 0;
+		offset.y = 3;
+		centerOrigin();
 
 		maxVelocity.set(MAX_SHIP_SPEED, MAX_SHIP_SPEED);
 
 		drag.set(SHIP_DRAG, SHIP_DRAG);
 
-		facing = FlxObject.RIGHT;
+		facing = RIGHT;
 	}
 
 	override function hurt(Damage:Float)
@@ -143,13 +166,27 @@ class Player extends FlxSprite
 
 		D.snd.play('transform');
 
+		animation.frameIndex = animFrames.get("transform");
+
+		trace(animation.frameIndex, animFrames.get("transform"));
+
 		if (mode == SHIP)
 		{
 			mode = MECH;
-			y -= 6;
-			makeGraphic(6, 12, FlxColor.WHITE);
 			width = 6;
 			height = 12;
+			offset.y = 0;
+			if (facing == LEFT)
+			{
+				offset.x = 5;
+			}
+			else if (facing == RIGHT)
+			{
+				offset.x = 1;
+			}
+			centerOrigin();
+			FlxG.camera.follow(this, FlxCameraFollowStyle.LOCKON);
+
 			maxVelocity.set(MAX_MECH_SPEED, MAX_MECH_SPEED);
 			drag.set(MECH_DRAG, MECH_DRAG);
 			acceleration.set();
@@ -159,15 +196,71 @@ class Player extends FlxSprite
 		else if (mode == MECH)
 		{
 			mode = SHIP;
-			x -= 6;
-			makeGraphic(12, 6, FlxColor.WHITE);
+			y -= 3;
+
 			width = 12;
 			height = 6;
+			offset.x = 0;
+			offset.y = 3;
+			centerOrigin();
+			FlxG.camera.follow(this, FlxCameraFollowStyle.LOCKON);
+
 			maxVelocity.set(MAX_SHIP_SPEED, MAX_SHIP_SPEED);
 			drag.set(SHIP_DRAG, SHIP_DRAG);
 			acceleration.set();
 			velocity.set();
 		}
+	}
+
+	override private function set_facing(Direction:FlxDirectionFlags):FlxDirectionFlags
+	{
+		super.set_facing(Direction);
+		if (mode == MECH)
+		{
+			if (facing == LEFT)
+			{
+				offset.x = 5;
+			}
+			else if (facing == RIGHT)
+			{
+				offset.x = 1;
+			}
+			centerOrigin();
+			FlxG.camera.follow(this, FlxCameraFollowStyle.LOCKON);
+		}
+		return facing;
+	}
+
+	override function draw()
+	{
+		// trace(player.isTouching(FLOOR), player.velocity.x != 0, player.animation.frameIndex, player.animFrames.get("step-1"));
+		if (Std.int(Globals.gameTimer * 10) % 2 == 0)
+		{
+			if (animation.frameIndex == animFrames.get("transform"))
+			{
+				if (transCooldown <= 0)
+					animation.frameIndex = animFrames.get(mode == SHIP ? "ship" : "step-1");
+			}
+			else if (mode == MECH && punchCooldown <= 0)
+			{
+				if ((isTouching(FLOOR) && velocity.x != 0) || (animation.frameIndex != animFrames.get("step-1")))
+				{
+					trace(animation.frameIndex);
+					if (animation.frameIndex == animFrames.get("step-1"))
+					{
+						animation.frameIndex = animFrames.get("step-2");
+						trace(2);
+					}
+					else
+					{
+						animation.frameIndex = animFrames.get("step-1");
+						trace(1);
+					}
+				}
+			}
+		}
+
+		super.draw();
 	}
 }
 

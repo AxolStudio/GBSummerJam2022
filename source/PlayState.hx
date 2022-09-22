@@ -79,9 +79,9 @@ class PlayState extends FlxState
 		bg.y = SCREEN_HEIGHT;
 
 		add(mapLayer = new FlxTypedGroup<FlxTilemap>());
+		add(explosions = new FlxTypedGroup<Explosion>());
 		add(playerAttacks = new FlxTypedGroup<FlxSprite>());
 		add(enemies = new FlxTypedGroup<Enemy>());
-		add(explosions = new FlxTypedGroup<Explosion>());
 
 		level = new TiledLevel("assets/data/world_01.tmx", this);
 
@@ -252,6 +252,10 @@ class PlayState extends FlxState
 		var n:Int = punches.shift();
 		D.snd.play('punch_$n');
 		punches.push(n);
+		if (n == 1)
+			player.animation.frameIndex = player.animFrames.get("punch-2");
+		else
+			player.animation.frameIndex = player.animFrames.get("punch-1");
 
 		player.punchCooldown = Player.PUNCH_COOLDOWN_TIME;
 		player.justPunchedCooldown = Player.JUSTPUNCHED_COOLDOWN_TIME;
@@ -645,34 +649,38 @@ class PlayState extends FlxState
 		}
 		else
 		{
-			if (Actions.attack.check())
+			if (player.transCooldown <= 0)
 			{
-				playerPunch();
-			}
+				if (Actions.attack.check())
+				{
+					playerPunch();
+				}
 
-			if (Actions.thrust.check())
-			{
-				if (player.thrust < player.thrustMax)
+				if (Actions.thrust.check())
 				{
-					player.velocity.y = -Player.MECH_THRUST;
-					player.thrust += elapsed;
-					thrustSnd = D.snd.play('thrust', 0.1, false, false);
-					spawnThrust(player.x + 3, player.y + player.height);
+					if (player.thrust < player.thrustMax)
+					{
+						player.velocity.y = -Player.MECH_THRUST;
+						player.thrust += elapsed;
+						thrustSnd = D.snd.play('thrust', 0.1, false, false);
+						spawnThrust(player.x + 3, player.y + player.height);
+						player.animation.frameIndex = player.animFrames.get("step-1");
+					}
+					else if (thrustSnd != null)
+					{
+						if (thrustSnd.playing)
+							thrustSnd.stop();
+					}
 				}
-				else if (thrustSnd != null)
+				else if (player.thrust > 0)
 				{
-					if (thrustSnd.playing)
-						thrustSnd.stop();
-				}
-			}
-			else if (player.thrust > 0)
-			{
-				player.thrust -= elapsed * 2;
-				player.thrust = Math.max(0, player.thrust);
-				if (thrustSnd != null)
-				{
-					if (thrustSnd.playing)
-						thrustSnd.stop();
+					player.thrust -= elapsed * 2;
+					player.thrust = Math.max(0, player.thrust);
+					if (thrustSnd != null)
+					{
+						if (thrustSnd.playing)
+							thrustSnd.stop();
+					}
 				}
 			}
 		}
@@ -686,6 +694,11 @@ class PlayState extends FlxState
 			player.acceleration.x /= (player.mode == SHIP ? 20 : 50);
 			if (Math.abs(player.acceleration.x) < 1)
 				player.acceleration.x = 0;
+		}
+
+		if (player.velocity.x != 0)
+		{
+			player.facing = player.velocity.x > 0 ? RIGHT : LEFT;
 		}
 	}
 }
