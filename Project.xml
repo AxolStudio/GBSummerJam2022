@@ -4,8 +4,8 @@
 
 	<!-- _________________________ Application Settings _________________________ -->
 
-	<app title="Hyper Space Attack Force: Starmanders" file="starmanders" main="Main" version="1.0" company="Axol Studio, LLC" company-url="axolstudio.com" />
-	<meta title="Hyper Space Attack Force: Starmanders" package="com.axolstudio.starmanders" version="1.0" company="Axol Studio, LLC" company-url="axolstudio.com" />
+	<app title="Hyper Space Attack Force: Starmander" file="starmanders" main="Main" version="1.0" company="Axol Studio, LLC" company-url="axolstudio.com" />
+	<meta title="Hyper Space Attack Force: Starmander" package="com.axolstudio.starmander" version="1.0" company="Axol Studio, LLC" company-url="axolstudio.com" />
 
 
 	<!--The flixel preloader is not accurate in Chrome. You can use it regularly if you embed the swf into a html file
