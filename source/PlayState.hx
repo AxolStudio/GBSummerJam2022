@@ -723,5 +723,8 @@ class PlayState extends FlxState
 		{
 			player.facing = player.velocity.x > 0 ? RIGHT : LEFT;
 		}
+
+		if (Actions.pause.check())
+			openSubState(new PauseSubState());
 	}
 }

@@ -213,6 +213,7 @@ class TitleState extends FlxState
 						s.next();
 					});
 				case 7:
+					D.snd.playMusic("game_music");
 					FlxTween.tween(subtitle, {y: letters[0].y + letters[0].height + 8}, .2,
 						{type: FlxTweenType.ONESHOT, ease: FlxEase.elasticOut, onComplete: (_) -> s.next()});
 				case 8:
